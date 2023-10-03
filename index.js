@@ -15,13 +15,10 @@ dotenv.config();
 
 // Mongodb Connection
 mongoose.connect(process.env.URI);
-mongoose.Promise = global.Promise;
-var db = mongoose.connection;
-db.on('connected', () => {
-  console.log("Mongoose connection done");
-})
-db.on("error", (err)=> {
-  console.log("Mongoose default connection fail: " + err);
+const conn = mongoose.connection;
+
+conn.once('open', () => {
+  console.log("Mongoose connection is done");
 })
 
 
@@ -29,7 +26,8 @@ app.get('/', (req,res)=> {
     return res.send("<p>QUIZ's Backend</p>")
 })
 
-const QuizRoutes = require("./routes/Quiz")
+const QuizRoutes = require("./routes/Quiz");
+const { log } = require('console');
 app.use('/api', QuizRoutes);
 
 
