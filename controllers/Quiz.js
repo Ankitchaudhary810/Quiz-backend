@@ -22,8 +22,9 @@ exports.postDrData = async (req, res) => {
 
   exports.getDoctorName = async (req, res) => {
     try {
-      const doctorNames = await Quiz.find({}, 'doctorName');
-      const doctorNameArray = doctorNames.map((doc) => doc.doctorName);
+      const doctorNames = await Quiz.find({});
+      const doctorNameArray = doctorNames.map((doc) => doc);
+      console.log({doctorNameArray});
   
       return res.json({ doctorNames: doctorNameArray });
     } catch (error) {
