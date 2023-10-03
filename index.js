@@ -14,7 +14,11 @@ dotenv.config();
 
 
 // Mongodb Connection
-mongoose.connect(process.env.URI);
+mongoose.set("strictQuery", false);
+mongoose.connect(process.env.URI , {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 const conn = mongoose.connection;
 
 conn.once('open', () => {
