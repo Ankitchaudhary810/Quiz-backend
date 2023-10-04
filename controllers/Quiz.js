@@ -23,26 +23,31 @@ exports.postDrData = async (req, res) => {
   exports.getDoctorName = async (req, res) => {
     try {
       const doctorNames = await Quiz.find({});
-      const doctorNameArray = doctorNames.map((doc) => doc);
+      let doctorNameArray = []
+      doctorNameArray = doctorNames.map((doc) => doc);
       console.log({doctorNameArray});
   
-      return res.json({ doctorNames: doctorNameArray });
+      return res.json(doctorNameArray);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
 
-exports.getOnlyName = async(req,res) => {
-
-  try {
-    const doctors = await Quiz.find({}, "doctorName"); 
-
-    const doctorNames = doctors.map((doctor) => doctor.doctorName);
-    res.json(doctorNames);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-
-}
+  exports.getOnlyName = async (req, res) => {
+    try {
+      const doctors = await Quiz.find({}, "doctorName");
+  
+      const doctorNamesObject = {};
+      doctors.forEach((doctor) => {
+        doctorNamesObject[`name_${doctor._id}`] = doctor.doctorName;
+      });
+  
+      res.json(doctorNamesObject);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+  
+  
