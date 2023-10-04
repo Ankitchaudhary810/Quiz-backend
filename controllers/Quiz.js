@@ -32,3 +32,17 @@ exports.postDrData = async (req, res) => {
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
+
+exports.getOnlyName = async(req,res) => {
+
+  try {
+    const doctors = await Quiz.find({}, "doctorName"); 
+
+    const doctorNames = doctors.map((doctor) => doctor.doctorName);
+    res.json(doctorNames);
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+
+}
