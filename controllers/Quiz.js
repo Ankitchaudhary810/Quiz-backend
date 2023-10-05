@@ -63,7 +63,7 @@ exports.postDrData = async (req, res) => {
   
         if (category.isPlayed) {
           // Category has already been played, return an error message
-          return res.status(400).json({ msg: "Category already played" });
+          return res.status(200).json({ msg: "Category already played" });
         }
   
         // Update the category as played and set the total points
