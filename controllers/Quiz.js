@@ -32,16 +32,14 @@ exports.postDrData = async (req, res) => {
     }
   };
 
-  exports.getOnlyName = async (req, res) => {
+  exports.handleUserDataById = async (req, res) => {
+    const userId = req.body.userId;
     try {
-      const doctors = await Quiz.find({}, "doctorName");
+      let doctor = []
+      doctor = await Quiz.findById(userId);
+      console.log({doctor});
   
-      const doctorNamesObject = {};
-      doctors.forEach((doctor) => {
-        doctorNamesObject[`name_${doctor._id}`] = doctor.doctorName;
-      });
-  
-      res.json(doctorNamesObject);
+      res.json(doctor);
     } catch (error) {
       console.error("Error fetching data:", error);
       res.status(500).json({ error: "Internal Server Error" });
