@@ -33,7 +33,7 @@ exports.postDrData = async (req, res) => {
   };
 
   exports.handleUserDataById = async (req, res) => {
-    const userId = req.body.userId;
+    const userId = req.params.userId;
     try {
       let doctor = []
       doctor = await Quiz.findById(userId);
