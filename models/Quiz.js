@@ -9,39 +9,66 @@ const doctorSchema = mongoose.Schema({
     state: String,
     QuizCategory:{
         Entertainment: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         Astronomy: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         History: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         Science: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         Literature: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         Geography: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         Wildlife: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         Technology: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
         Mathematics: {
-            isPlayed: Boolean,
+            isPlayed:{
+                type: Boolean,
+                default:false
+            },
             TotalPoints: Number
         },
     } 
