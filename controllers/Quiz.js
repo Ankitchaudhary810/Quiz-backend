@@ -80,7 +80,8 @@ exports.handleUserQuizSubmit = async (req, res) => {
       }).select('doctorName QuizCategory').exec();
 
       // Extract doctor names and scores from the result
-      const categoryLeaderboard = users.map(user => ({
+      let categoryLeaderboard = []
+      categoryLeaderboard = users.map(user => ({
         doctorName: user.doctorName,
         score: user.QuizCategory[categoryName].TotalPoints
       }));
