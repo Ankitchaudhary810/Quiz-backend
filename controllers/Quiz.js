@@ -104,22 +104,54 @@ exports.handleUserQuizSubmit = async (req, res) => {
 
 
 
-exports.handleLeaderBoardFilter = async(req, res) => {
+exports.handleLeaderBoardFilter = async (req, res) => {
   const state = req.body.state;
   const categoryName = req.body.categoryName;
 
   try {
+    if (!state || !categoryName) {
+      return res.status(400).json({
+        msg: "State and categoryName are required"
+      });
+    }
 
+    // Find all users from the specified state
+    const users = await Quiz.find({ state });
 
-    
+    if (!users || users.length === 0) {
+      return res.status(404).json({
+        msg: "No users found for the given state"
+      });
+    }
+
+    console.log({state})
+
+    // Filter users by category and isPlayed flag
+    const categoryLeaderboard = users
+      .filter(user => {
+        const category = user.QuizCategory && user.QuizCategory[categoryName];
+        return category && category.isPlayed === true;
+      })
+      .map(user => ({
+        doctorName: user.doctorName,
+        score: user.QuizCategory[categoryName].TotalPoints
+      }));
+
+      console.log({categoryLeaderboard});
+
+    return res.status(200).json({
+      msg: "Leaderboard retrieved successfully",
+      categoryLeaderboard
+    });
   } catch (error) {
-    console.log("Error in handleLeaderBoardFilter Routes: ", error);
-    return res.status(401).json({
-      msg:"Internal Server Error",
-      error
-    })
+    console.error("Error in handleLeaderBoardFilter Route: ", error);
+    return res.status(500).json({
+      msg: "Internal Server Error"
+    });
   }
-}
+};
+
+
 
 
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
