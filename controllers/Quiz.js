@@ -10,8 +10,12 @@ exports.postDrData = async (req, res) => {
     state: state,
   });
   try {
-    await newDoctor.save();
-    return res.status(201).json({ message: 'Doctor data inserted' });
+    const data = await newDoctor.save();
+    const Id = data._id;
+    return res.status(201).json({
+      message: 'Doctor data inserted',
+      Id
+     });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal Server Error' });
