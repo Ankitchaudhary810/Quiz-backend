@@ -65,7 +65,6 @@ exports.handleUserQuizSubmit = async (req, res) => {
       const category = user.QuizCategory[categoryName];
 
       if (category.isPlayed) {
-        // Category has already been played, return an error message
         return res.status(200).json({ msg: "Category already played" });
       }
 
@@ -75,9 +74,6 @@ exports.handleUserQuizSubmit = async (req, res) => {
 
       await user.save();
 
-      // const users = await Quiz.find({
-      //   [`QuizCategory.${categoryName}.isPlayed`]: true
-      // }).exec();
 
       const users = await Quiz.find({
         [`QuizCategory.${categoryName}.isPlayed`]: true
@@ -106,3 +102,65 @@ exports.handleUserQuizSubmit = async (req, res) => {
   }
 };
 
+
+
+exports.handleLeaderBoardFilter = async(req, res) => {
+  const state = req.body.state;
+  const categoryName = req.body.categoryName;
+
+  try {
+
+
+    
+  } catch (error) {
+    console.log("Error in handleLeaderBoardFilter Routes: ", error);
+    return res.status(401).json({
+      msg:"Internal Server Error",
+      error
+    })
+  }
+}
+
+
+exports.handleLeaderFilterByCategoryName = async (req, res) => {
+  const categoryName = req.params.categoryName;
+
+  try {
+    if (!categoryName) {
+      return res.status(400).json({
+        msg: "CategoryName is required"
+      });
+    }
+
+    // Check if the categoryName exists in the database
+    const category = await Quiz.findOne({ [`QuizCategory.${categoryName}`]: { $exists: true } });
+
+    if (!category) {
+      return res.status(301).json({
+        msg: "CategoryName does not exist in the database"
+      });
+    }
+
+    // Find all users who have played the specified category
+    const users = await Quiz.find({
+      [`QuizCategory.${categoryName}.isPlayed`]: true
+    }).select('doctorName QuizCategory').exec();
+
+    // Extract doctor names and scores from the result
+    let categoryLeaderboard = []
+    categoryLeaderboard = users.map(user => ({
+      doctorName: user.doctorName,
+      score: user.QuizCategory[categoryName].TotalPoints
+    }));
+
+    return res.status(200).json({
+      msg: "Category leaderboard retrieved successfully",
+      categoryLeaderboard
+    });
+  } catch (error) {
+    console.error("error:", error);
+    return res.status(500).json({
+      msg: "Internal Server Error"
+    });
+  }
+};
