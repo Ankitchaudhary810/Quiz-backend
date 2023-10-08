@@ -196,3 +196,17 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
     });
   }
 };
+
+
+
+exports.handleUsersStateAndName = async (req, res) => {
+  
+  try {
+    const doctorDetails = await Quiz.find().select('doctorName state city -_id');
+    console.log({ doctorDetails }); 
+    return res.json(doctorDetails);
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).json({ message: 'Internal Server Error' , error });
+  }
+};
