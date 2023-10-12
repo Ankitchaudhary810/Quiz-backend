@@ -176,12 +176,15 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
     // Find all users who have played the specified category
     const users = await Quiz.find({
       [`QuizCategory.${categoryName}.isPlayed`]: true
-    }).select('doctorName QuizCategory').exec();
+    }).select('doctorName QuizCategory state city').exec();
 
     // Extract doctor names and scores from the result
     let categoryLeaderboard = []
+    console.log({users});
     categoryLeaderboard = users.map(user => ({
       doctorName: user.doctorName,
+      state: user.state,
+      city:user.city,
       score: user.QuizCategory[categoryName].TotalPoints
     }));
 
