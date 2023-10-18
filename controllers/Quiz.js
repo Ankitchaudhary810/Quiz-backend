@@ -15,7 +15,7 @@ exports.postDrData = async (req, res) => {
     return res.status(201).json({
       message: 'Doctor data inserted',
       Id
-     });
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Internal Server Error' });
@@ -124,7 +124,7 @@ exports.handleLeaderBoardFilter = async (req, res) => {
       });
     }
 
-    console.log({state})
+    console.log({ state })
 
     // Filter users by category and isPlayed flag
     const categoryLeaderboard = users
@@ -137,7 +137,7 @@ exports.handleLeaderBoardFilter = async (req, res) => {
         score: user.QuizCategory[categoryName].TotalPoints
       }));
 
-      console.log({categoryLeaderboard});
+    console.log({ categoryLeaderboard });
 
     return res.status(200).json({
       msg: "Leaderboard retrieved successfully",
@@ -180,11 +180,11 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
 
     // Extract doctor names and scores from the result
     let categoryLeaderboard = []
-    console.log({users});
+    console.log({ users });
     categoryLeaderboard = users.map(user => ({
       doctorName: user.doctorName,
       state: user.state,
-      city:user.city,
+      city: user.city,
       score: user.QuizCategory[categoryName].TotalPoints
     }));
 
@@ -203,13 +203,35 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
 
 
 exports.handleUsersStateAndName = async (req, res) => {
-  
+
   try {
     const doctorDetails = await Quiz.find().select('doctorName state city -_id');
-    console.log({ doctorDetails }); 
+    console.log({ doctorDetails });
     return res.json(doctorDetails);
   } catch (error) {
     console.error(error.message);
-    return res.status(500).json({ message: 'Internal Server Error' , error });
+    return res.status(500).json({ message: 'Internal Server Error', error });
   }
 };
+
+exports.handleOnlyNameWithId = async (req, res) => {
+
+  try {
+    let doc = []
+    doc = await Quiz.find().select('_id , doctorName');
+    if (!doc) {
+      return res.status(300).json({
+        msg: "No doctor found"
+      })
+    }
+    return res.status(200).json(doc)
+  }
+  catch (e) {
+    console.log("error: ");
+    return res.status(501).json({
+      msg: "Error in handleOnlyNameWithId"
+    })
+  }
+
+
+}
