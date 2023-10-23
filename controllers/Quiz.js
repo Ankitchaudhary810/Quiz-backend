@@ -231,7 +231,7 @@ exports.handleOnlyNameWithId = async (req, res) => {
 };
 
 exports.handleUserCategory = async (req, res) => {
-  const { userId } = req.body;
+  const { userId } = req.params;
 
   try {
     if (!userId) {
