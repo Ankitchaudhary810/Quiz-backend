@@ -1,5 +1,4 @@
-const Quiz = require("../models/Quiz")
-
+const Quiz = require("../models/Quiz");
 
 exports.postDrData = async (req, res) => {
   const { doctorName, city, state } = req.body;
@@ -13,33 +12,33 @@ exports.postDrData = async (req, res) => {
     const data = await newDoctor.save();
     const Id = data._id;
     return res.status(201).json({
-      message: 'Doctor data inserted',
-      Id
+      message: "Doctor data inserted",
+      Id,
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 exports.getDoctorName = async (req, res) => {
   try {
     const doctorNames = await Quiz.find({});
-    let doctorNameArray = []
+    let doctorNameArray = [];
     doctorNameArray = doctorNames.map((doc) => doc);
     console.log({ doctorNameArray });
 
     return res.json(doctorNameArray);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 exports.handleUserDataById = async (req, res) => {
   const userId = req.params.userId;
   try {
-    let doctor = []
+    let doctor = [];
     doctor = await Quiz.findById(userId);
     console.log({ doctor });
 
@@ -74,16 +73,17 @@ exports.handleUserQuizSubmit = async (req, res) => {
 
       await user.save();
 
-
       const users = await Quiz.find({
-        [`QuizCategory.${categoryName}.isPlayed`]: true
-      }).select('doctorName QuizCategory').exec();
+        [`QuizCategory.${categoryName}.isPlayed`]: true,
+      })
+        .select("doctorName QuizCategory")
+        .exec();
 
       // Extract doctor names and scores from the result
-      let categoryLeaderboard = []
-      categoryLeaderboard = users.map(user => ({
+      let categoryLeaderboard = [];
+      categoryLeaderboard = users.map((user) => ({
         doctorName: user.doctorName,
-        score: user.QuizCategory[categoryName].TotalPoints
+        score: user.QuizCategory[categoryName].TotalPoints,
       }));
 
       console.log(categoryLeaderboard);
@@ -91,7 +91,7 @@ exports.handleUserQuizSubmit = async (req, res) => {
       return res.status(200).json({
         msg: "QuizCategory updated successfully",
         categoryName,
-        categoryLeaderboard
+        categoryLeaderboard,
       });
     } else {
       return res.status(404).json({ msg: "Category not found" });
@@ -102,8 +102,6 @@ exports.handleUserQuizSubmit = async (req, res) => {
   }
 };
 
-
-
 exports.handleLeaderBoardFilter = async (req, res) => {
   const state = req.body.state;
   const categoryName = req.body.categoryName;
@@ -111,7 +109,7 @@ exports.handleLeaderBoardFilter = async (req, res) => {
   try {
     if (!state || !categoryName) {
       return res.status(400).json({
-        msg: "State and categoryName are required"
+        msg: "State and categoryName are required",
       });
     }
 
@@ -120,39 +118,36 @@ exports.handleLeaderBoardFilter = async (req, res) => {
 
     if (!users || users.length === 0) {
       return res.status(404).json({
-        msg: "No users found for the given state"
+        msg: "No users found for the given state",
       });
     }
 
-    console.log({ state })
+    console.log({ state });
 
     // Filter users by category and isPlayed flag
     const categoryLeaderboard = users
-      .filter(user => {
+      .filter((user) => {
         const category = user.QuizCategory && user.QuizCategory[categoryName];
         return category && category.isPlayed === true;
       })
-      .map(user => ({
+      .map((user) => ({
         doctorName: user.doctorName,
-        score: user.QuizCategory[categoryName].TotalPoints
+        score: user.QuizCategory[categoryName].TotalPoints,
       }));
 
     console.log({ categoryLeaderboard });
 
     return res.status(200).json({
       msg: "Leaderboard retrieved successfully",
-      categoryLeaderboard
+      categoryLeaderboard,
     });
   } catch (error) {
     console.error("Error in handleLeaderBoardFilter Route: ", error);
     return res.status(500).json({
-      msg: "Internal Server Error"
+      msg: "Internal Server Error",
     });
   }
 };
-
-
-
 
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
   const categoryName = req.params.categoryName;
@@ -160,78 +155,117 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
   try {
     if (!categoryName) {
       return res.status(400).json({
-        msg: "CategoryName is required"
+        msg: "CategoryName is required",
       });
     }
 
     // Check if the categoryName exists in the database
-    const category = await Quiz.findOne({ [`QuizCategory.${categoryName}`]: { $exists: true } });
+    const category = await Quiz.findOne({
+      [`QuizCategory.${categoryName}`]: { $exists: true },
+    });
 
     if (!category) {
       return res.status(301).json({
-        msg: "CategoryName does not exist in the database"
+        msg: "CategoryName does not exist in the database",
       });
     }
 
     // Find all users who have played the specified category
     const users = await Quiz.find({
-      [`QuizCategory.${categoryName}.isPlayed`]: true
-    }).select('doctorName QuizCategory state city').exec();
+      [`QuizCategory.${categoryName}.isPlayed`]: true,
+    })
+      .select("doctorName QuizCategory state city")
+      .exec();
 
     // Extract doctor names and scores from the result
-    let categoryLeaderboard = []
+    let categoryLeaderboard = [];
     console.log({ users });
-    categoryLeaderboard = users.map(user => ({
+    categoryLeaderboard = users.map((user) => ({
       doctorName: user.doctorName,
       state: user.state,
       city: user.city,
-      score: user.QuizCategory[categoryName].TotalPoints
+      score: user.QuizCategory[categoryName].TotalPoints,
     }));
 
     return res.status(200).json({
       msg: "Category leaderboard retrieved successfully",
-      categoryLeaderboard
+      categoryLeaderboard,
     });
   } catch (error) {
     console.error("error:", error);
     return res.status(500).json({
-      msg: "Internal Server Error"
+      msg: "Internal Server Error",
     });
   }
 };
 
-
-
 exports.handleUsersStateAndName = async (req, res) => {
-
   try {
-    const doctorDetails = await Quiz.find().select('doctorName state city -_id');
+    const doctorDetails = await Quiz.find().select(
+      "doctorName state city -_id"
+    );
     console.log({ doctorDetails });
     return res.json(doctorDetails);
   } catch (error) {
     console.error(error.message);
-    return res.status(500).json({ message: 'Internal Server Error', error });
+    return res.status(500).json({ message: "Internal Server Error", error });
   }
 };
 
 exports.handleOnlyNameWithId = async (req, res) => {
-
   try {
-    let doc = []
-    doc = await Quiz.find().select('_id , doctorName');
+    let doc = [];
+    doc = await Quiz.find().select("_id , doctorName");
     if (!doc) {
       return res.status(300).json({
-        msg: "No doctor found"
-      })
+        msg: "No doctor found",
+      });
     }
-    return res.status(200).json(doc)
-  }
-  catch (e) {
+    return res.status(200).json(doc);
+  } catch (e) {
     console.log("error: ");
     return res.status(501).json({
-      msg: "Error in handleOnlyNameWithId"
-    })
+      msg: "Error in handleOnlyNameWithId",
+    });
   }
+};
 
+exports.handleUserCategory = async (req, res) => {
+  const { userId } = req.body;
 
-}
+  try {
+    if (!userId) {
+      return res.status(401).json({
+        msg: "user Id Required",
+      });
+    }
+
+    const user = await Quiz.findById(userId).select("QuizCategory").lean();
+    console.log("user", user);
+
+    if (!user) {
+      return res.status(401).json({
+        msg: "No Game Category Found",
+      });
+    }
+
+    const userCategories = user.QuizCategory;
+    const formattedCategories = [];
+
+    for (const category in userCategories) {
+      formattedCategories.push({
+        [category]: {
+          isPlayed: userCategories[category].isPlayed,
+          TotalPoints: userCategories[category].TotalPoints,
+        },
+      });
+    }
+
+    return res.status(200).json(formattedCategories);
+  } catch (error) {
+    return res.status(501).json({
+      msg: "Internal Server Error",
+    });
+  }
+};
+

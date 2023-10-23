@@ -15,7 +15,7 @@ dotenv.config();
 
 // Mongodb Connection
 mongoose.set("strictQuery", false);
-mongoose.connect(process.env.URI , {
+mongoose.connect(process.env.URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
@@ -26,8 +26,8 @@ conn.once('open', () => {
 })
 
 
-app.get('/', (req,res)=> {
-    return res.send("<p>QUIZ's Backend</p>")
+app.get('/', (req, res) => {
+  return res.send("<p>QUIZ's Backend</p>")
 })
 
 const QuizRoutes = require("./routes/Quiz");
@@ -35,7 +35,7 @@ const { log } = require('console');
 app.use('/api', QuizRoutes);
 
 
-const port = process.env.PORT || 5000;
-app.listen(port, ()=> {
-    console.log("Server is running At" , port);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log("Server is running At", port);
 })
