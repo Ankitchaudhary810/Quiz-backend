@@ -7,71 +7,86 @@ const doctorSchema = mongoose.Schema({
     doctorName: String,
     city: String,
     state: String,
-    QuizCategory:{
+    QuizCategory: {
         Entertainment: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
             TotalPoints: Number
         },
         Astronomy: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
             TotalPoints: Number
         },
         History: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
             TotalPoints: Number
         },
         Science: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
             TotalPoints: Number
         },
         Literature: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         Geography: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         Wildlife: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         Technology: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         Mathematics: {
-            isPlayed:{
+            isPlayed: {
                 type: Boolean,
-                default:false
+                default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
-    } 
+    }
 
 })
 

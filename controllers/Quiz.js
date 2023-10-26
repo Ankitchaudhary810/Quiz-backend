@@ -230,13 +230,53 @@ exports.handleOnlyNameWithId = async (req, res) => {
   }
 };
 
+// exports.handleUserCategory = async (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+//     if (!userId) {
+//       return res.status(401).json({
+//         msg: "user Id Required",
+//       });
+//     }
+
+//     const user = await Quiz.findById(userId).select("QuizCategory").lean();
+//     console.log("user", user);
+
+//     if (!user) {
+//       return res.status(401).json({
+//         msg: "No Game Category Found",
+//       });
+//     }
+
+//     const userCategories = user.QuizCategory;
+//     const formattedCategories = [];
+
+//     for (const category in userCategories) {
+//       formattedCategories.push({
+//         [category]: {
+//           isPlayed: userCategories[category].isPlayed,
+//           TotalPoints: userCategories[category].TotalPoints,
+//         },
+//       });
+//     }
+
+//     return res.status(200).json(formattedCategories);
+//   } catch (error) {
+//     return res.status(501).json({
+//       msg: "Internal Server Error",
+//     });
+//   }
+// };
+
+
 exports.handleUserCategory = async (req, res) => {
   const { userId } = req.params;
 
   try {
     if (!userId) {
       return res.status(401).json({
-        msg: "user Id Required",
+        msg: "User Id Required",
       });
     }
 
@@ -254,18 +294,16 @@ exports.handleUserCategory = async (req, res) => {
 
     for (const category in userCategories) {
       formattedCategories.push({
-        [category]: {
-          isPlayed: userCategories[category].isPlayed,
-          TotalPoints: userCategories[category].TotalPoints,
-        },
+        category: category, // Add the category name
+        isPlayed: userCategories[category].isPlayed,
+        TotalPoints: userCategories[category].TotalPoints,
       });
     }
 
     return res.status(200).json(formattedCategories);
   } catch (error) {
-    return res.status(501).json({
+    return res.status(500).json({ // Use 500 for internal server error
       msg: "Internal Server Error",
     });
   }
 };
-
