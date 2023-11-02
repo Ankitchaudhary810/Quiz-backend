@@ -55,7 +55,7 @@ exports.handleUserQuizSubmit = async (req, res) => {
   const categoryName = req.body.categoryName;
   try {
     const user = await Quiz.findById(userId);
-
+    console.log({ user });
     if (!user) {
       return res.status(401).json({ msg: "User not found" });
     }
@@ -72,7 +72,6 @@ exports.handleUserQuizSubmit = async (req, res) => {
       category.TotalPoints = totalPoints;
 
       await user.save();
-
       const users = await Quiz.find({
         [`QuizCategory.${categoryName}.isPlayed`]: true,
       })
@@ -85,9 +84,7 @@ exports.handleUserQuizSubmit = async (req, res) => {
         doctorName: user.doctorName,
         score: user.QuizCategory[categoryName].TotalPoints,
       }));
-
       console.log(categoryLeaderboard);
-
       return res.status(200).json({
         msg: "QuizCategory updated successfully",
         categoryName,
@@ -98,7 +95,7 @@ exports.handleUserQuizSubmit = async (req, res) => {
     }
   } catch (error) {
     console.log("error: ", error);
-    return res.status(400).json({ msg: "Internal Server Error" });
+    return res.status(400).json({ msg: "Internal Server Error", error });
   }
 };
 
