@@ -13,28 +13,40 @@ const doctorSchema = mongoose.Schema({
                 type: Boolean,
                 default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         Astronomy: {
             isPlayed: {
                 type: Boolean,
                 default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         History: {
             isPlayed: {
                 type: Boolean,
                 default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         Science: {
             isPlayed: {
                 type: Boolean,
                 default: false
             },
-            TotalPoints: Number
+            TotalPoints: {
+                type: Number,
+                default: 0
+            }
         },
         Literature: {
             isPlayed: {
