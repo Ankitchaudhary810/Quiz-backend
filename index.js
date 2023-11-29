@@ -4,6 +4,10 @@ const cors = require("cors");
 const path = require("path");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
+const apicache = require("apicache");
+
+
+
 
 
 
@@ -11,6 +15,10 @@ const mongoose = require("mongoose");
 app.use(cors());
 app.use(express.json());
 dotenv.config();
+
+// For Caching
+// const cache = apicache.middleware
+// app.use(cache('60 minutes'))
 
 
 // Mongodb Connection
@@ -31,8 +39,9 @@ app.get('/', (req, res) => {
 })
 
 const QuizRoutes = require("./routes/Quiz");
-const { log } = require('console');
+const MrRotues = require("./routes/Mr");
 app.use('/api', QuizRoutes);
+app.use('/api', MrRotues)
 
 
 const port = process.env.PORT || 3000;

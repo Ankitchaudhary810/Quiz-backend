@@ -1,13 +1,20 @@
 const Quiz = require("../models/Quiz");
-
+const mrModel = require("../models/Mr")
 exports.postDrData = async (req, res) => {
-  const { doctorName, city, state } = req.body;
+  const { doctorName, city, state, mrId } = req.body;
+
+  let mr = await mrModel.findById({ _id: mrId });
+  if (!mr) return res.status(400).json({ msg: "MR Not Found" });
+
+  console.log({ mr });
 
   const newDoctor = new Quiz({
     doctorName: doctorName,
     city: city,
     state: state,
+    mrReference: mr._id
   });
+
   try {
     const data = await newDoctor.save();
     const Id = data._id;
@@ -20,6 +27,8 @@ exports.postDrData = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+
 
 exports.getDoctorName = async (req, res) => {
   try {

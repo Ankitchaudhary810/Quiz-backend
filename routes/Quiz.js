@@ -3,6 +3,10 @@ const router = express.Router();
 
 const { postDrData, getDoctorName, handleUserDataById, handleUserQuizSubmit, handleLeaderBoardFilter, handleLeaderFilterByCategoryName, handleUsersStateAndName, handleOnlyNameWithId, handleUserCategory } = require("../controllers/Quiz")
 
+
+
+
+
 router.post("/user", postDrData);
 router.get("/get/docter/name", getDoctorName);
 router.get("/get/users/:userId", handleUserDataById);

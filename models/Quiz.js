@@ -7,6 +7,10 @@ const doctorSchema = mongoose.Schema({
     doctorName: String,
     city: String,
     state: String,
+    mrReference: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Mr"
+    },
     QuizCategory: {
         Entertainment: {
             isPlayed: {
@@ -102,5 +106,5 @@ const doctorSchema = mongoose.Schema({
 
 })
 
-const Quiz = mongoose.model('Quiz', doctorSchema)
+const Quiz = mongoose.model('Quiz', doctorSchema);
 module.exports = Quiz;
