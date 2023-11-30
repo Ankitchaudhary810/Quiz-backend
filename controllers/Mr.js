@@ -8,7 +8,7 @@ const createMr = async (req, res) => {
         let mr;
         mr = await mrModel.findOne({ MRID: MRID });
 
-        if (mr) return res.status(400).json({ msg: "MRID is already Exists" });
+        if (mr) return res.status(400).json({ msg: "MRID is already Exists!" });
 
         mr = new mrModel({
             USERNAME,
