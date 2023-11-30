@@ -23,6 +23,10 @@ const createMr = async (req, res) => {
             SCCODE,
         });
 
+        mr.loginLogs.push({
+            timestamp: new Date(),
+            cnt: 1
+        });
         await mr.save();
 
 
@@ -56,7 +60,7 @@ const loginMr = async (req, res) => {
             timestamp: new Date(),
             cnt: mr.loginLogs.length + 1
         });
-
+        console.log(mr.loginLogs);
         await mr.save();
 
         const mrId = mr._id

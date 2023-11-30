@@ -7,7 +7,6 @@ exports.postDrData = async (req, res) => {
   if (!mr) return res.status(400).json({ msg: "MR Not Found" });
 
   console.log({ mr });
-
   const newDoctor = new Quiz({
     doctorName: doctorName,
     city: city,
