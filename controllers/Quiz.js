@@ -219,14 +219,17 @@ exports.handleUsersStateAndName = async (req, res) => {
 
 exports.handleOnlyNameWithId = async (req, res) => {
   try {
-    let doc = [];
-    doc = await Quiz.find().select("_id , doctorName");
-    if (!doc) {
-      return res.status(300).json({
-        msg: "No doctor found",
+    const { mrId } = req.body;
+
+    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName');
+
+    if (!doctors || doctors.length === 0) {
+      return res.status(404).json({
+        msg: 'No Doctors Found for the specified MR',
       });
     }
-    return res.status(200).json(doc);
+
+    return res.status(200).json(doctors);
   } catch (e) {
     console.log("error: ");
     return res.status(501).json({

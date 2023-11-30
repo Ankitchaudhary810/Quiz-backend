@@ -14,7 +14,7 @@ router.post("/submit/score", handleUserQuizSubmit);
 router.post("/get/filter/leaderboard", handleLeaderBoardFilter);
 router.get("/get/leaderboard/:categoryName", handleLeaderFilterByCategoryName);
 router.get("/get/users-name-state-city", handleUsersStateAndName);
-router.get('/get/get-only-name-with-id', handleOnlyNameWithId);
+router.post('/get/get-only-name-with-id', handleOnlyNameWithId);
 router.get("/get/user-category/:userId", handleUserCategory);
 
 
