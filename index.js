@@ -16,9 +16,6 @@ app.use(cors());
 app.use(express.json());
 dotenv.config();
 
-// For Caching
-const cache = apicache.middleware
-app.use(cache('60 minutes'))
 
 
 // Mongodb Connection
