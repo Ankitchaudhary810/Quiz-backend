@@ -6,7 +6,7 @@ const createMr = async (req, res) => {
         const { USERNAME, MRID, PASSWORD, EMAIL, ROLE, HQ, REGION, BUSINESSUNIT, DOJ, SCCODE } = req.body;
 
         let mr;
-        mr = await mrModel.findOne({ USERNAME: USERNAME });
+        mr = await mrModel.findOne({ MRID: MRID });
 
         if (mr) return res.status(400).json({ msg: "MRID is already Exists" });
 
@@ -22,6 +22,7 @@ const createMr = async (req, res) => {
             DOJ,
             SCCODE,
         });
+        console.log({ mr })
 
         mr.loginLogs.push({
             timestamp: new Date(),
