@@ -22,7 +22,6 @@ const createMr = async (req, res) => {
             DOJ,
             SCCODE,
         });
-        console.log({ mr })
 
         mr.loginLogs.push({
             timestamp: new Date(),
