@@ -503,9 +503,11 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
 
     return res.status(200).json({ formattedCategories, questions, FourQuestion, OnlyActiveCategories });
   } catch (error) {
+    const err = error.message;
     console.error(error); // Log the error for debugging
     return res.status(500).json({
       msg: "Internal Server Error",
+      err
     });
   }
 };
