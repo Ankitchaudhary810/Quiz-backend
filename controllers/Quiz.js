@@ -1,5 +1,6 @@
 const Quiz = require("../models/Quiz");
-const mrModel = require("../models/Mr")
+const mrModel = require("../models/Mr");
+const fetch = require("node-fetch");
 exports.postDrData = async (req, res) => {
   const { doctorName, city, state, mrId } = req.body;
 
