@@ -1,6 +1,6 @@
 const Quiz = require("../models/Quiz");
 const mrModel = require("../models/Mr");
-
+const axios = require("axios")
 exports.postDrData = async (req, res) => {
   const { doctorName, city, state, mrId } = req.body;
 
@@ -480,37 +480,38 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
       });
     }
 
-    let questions = []
-    await fetch(`https://backup-quiz-server.onrender.com/api/questions`, {
-      method: "GET"
-    }).then(res => res.json()).then(data => {
-      console.log("data: ", data);
-      questions = data
-    });
+    let questions = [];
+    try {
+      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questions');
+      questions = response.data;
+      console.log("data: ", questions);
+    } catch (error) {
+      console.error(error);
+    }
 
-    // let FourQuestion = []
-    // await fetch("https://backup-quiz-server.onrender.com/api/questionfour", {
-    //   method: "GET",
-    // }).then(res => res.json()).then(data => {
-    //   FourQuestion = data
-    // });
+    let FourQuestion = [];
+    try {
+      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questionfour');
+      FourQuestion = response.data;
+    } catch (error) {
+      console.error(error);
+    }
 
-    // let OnlyActiveCategories = []
-    // await fetch("https://backup-quiz-server.onrender.com/onlyactivecategories", {
-    //   method: "GET"
-    // }).then(res => res.json()).then(data => {
-    //   OnlyActiveCategories = data;
-    // })
+    let OnlyActiveCategories = [];
+    try {
+      const response = await axios.get('https://backup-quiz-server.onrender.com/onlyactivecategories');
+      OnlyActiveCategories = response.data;
+    } catch (error) {
+      console.error(error);
+    }
 
-    return res.status(200).json({ formattedCategories, questions });
+    return res.status(200).json({ formattedCategories, questions, FourQuestion, OnlyActiveCategories });
   } catch (error) {
     const err = error.message;
-    console.error(error); // Log the error for debugging
+    console.error(error);
     return res.status(500).json({
       msg: "Internal Server Error",
       err
     });
   }
 };
-
-
