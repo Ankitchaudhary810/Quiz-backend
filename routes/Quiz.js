@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router();
 
-const { postDrData, getDoctorName, handleUserDataById, handleUserQuizSubmit, handleLeaderBoardFilter, handleLeaderFilterByCategoryName, handleUsersStateAndName, handleOnlyNameWithId, handleUserCategory } = require("../controllers/Quiz")
+const { postDrData, getDoctorName, handleUserDataById, handleUserQuizSubmit, handleLeaderBoardFilter, handleLeaderFilterByCategoryName, handleUsersStateAndName, handleOnlyNameWithId, handleUserCategory, handleUserCategoryWithQuestion } = require("../controllers/Quiz")
 
 
 
@@ -13,7 +13,10 @@ router.post("/get/filter/leaderboard", handleLeaderBoardFilter);
 router.get("/get/leaderboard/:categoryName", handleLeaderFilterByCategoryName);
 router.get("/get/users-name-state-city", handleUsersStateAndName);
 router.post('/get/get-only-name-with-id', handleOnlyNameWithId);
+
 router.get("/get/user-category/:userId", handleUserCategory);
+
+router.get("/get/user-category-with-questions/:userId", handleUserCategoryWithQuestion)
 
 
 module.exports = router;

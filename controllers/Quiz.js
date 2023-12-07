@@ -436,6 +436,8 @@ exports.handleUserCategory = async (req, res) => {
       });
     }
 
+
+
     return res.status(200).json(formattedCategories);
   } catch (error) {
     console.error(error); // Log the error for debugging
@@ -444,4 +446,54 @@ exports.handleUserCategory = async (req, res) => {
     });
   }
 };
+
+
+
+exports.handleUserCategoryWithQuestion = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!userId) {
+      return res.status(401).json({
+        msg: "User Id Required",
+      });
+    }
+
+    const user = await Quiz.findById(userId).select("quizCategories").lean(); // Adjust the field name to match your schema
+    console.log("user", user);
+
+    if (!user) {
+      return res.status(401).json({
+        msg: "No Game Category Found",
+      });
+    }
+
+    const userCategories = user.quizCategories;
+    const formattedCategories = [];
+
+    for (const category of userCategories) {
+      formattedCategories.push({
+        categoryName: category.categoryName, // Adjust the property name
+        isPlayed: category.isPlayed,
+        TotalPoints: category.TotalPoints,
+      });
+    }
+
+    let questions = []
+    await fetch(`https://backup-quiz-server.onrender.com/api/questions`, {
+      method: "GET"
+    }).then(res => res.json()).then(data => {
+      console.log("data: ", data);
+      questions = data
+    })
+
+    return res.status(200).json({ formattedCategories, questions });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    return res.status(500).json({
+      msg: "Internal Server Error",
+    });
+  }
+};
+
 
