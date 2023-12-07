@@ -485,9 +485,23 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
     }).then(res => res.json()).then(data => {
       console.log("data: ", data);
       questions = data
+    });
+
+    let FourQuestion = []
+    await fetch("https://backup-quiz-server.onrender.com/api/questionfour", {
+      method: "GET",
+    }).then(res => res.json()).then(data => {
+      FourQuestion = data
+    });
+
+    let OnlyActiveCategories = []
+    await fetch("https://backup-quiz-server.onrender.com/onlyactivecategories", {
+      method: "GET"
+    }).then(res => res.json()).then(data => {
+      OnlyActiveCategories = data;
     })
 
-    return res.status(200).json({ formattedCategories, questions });
+    return res.status(200).json({ formattedCategories, questions, FourQuestion, OnlyActiveCategories });
   } catch (error) {
     console.error(error); // Log the error for debugging
     return res.status(500).json({

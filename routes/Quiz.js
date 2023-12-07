@@ -16,7 +16,7 @@ router.post('/get/get-only-name-with-id', handleOnlyNameWithId);
 
 router.get("/get/user-category/:userId", handleUserCategory);
 
-router.get("/get/user-category-with-questions/:userId", handleUserCategoryWithQuestion)
+router.get("/get/user-category-with-mulquestions-fourquestions/:userId", handleUserCategoryWithQuestion)
 
 
 module.exports = router;
