@@ -57,55 +57,141 @@ exports.handleUserDataById = async (req, res) => {
   }
 };
 
+// exports.handleUserQuizSubmit = async (req, res) => {
+//   const userId = req.body.userId;
+//   const totalPoints = req.body.totalPoints;
+//   const categoryName = req.body.categoryName;
+//   try {
+//     const user = await Quiz.findById(userId);
+//     console.log({ user });
+//     if (!user) {
+//       return res.status(401).json({ msg: "User not found" });
+//     }
+
+//     if (user.QuizCategory && user.QuizCategory[categoryName]) {
+//       const category = user.QuizCategory[categoryName];
+
+//       if (category.isPlayed) {
+//         return res.status(200).json({ msg: "Category already played" });
+//       }
+
+//       // Update the category as played and set the total points
+//       category.isPlayed = true;
+//       category.TotalPoints = totalPoints;
+
+//       await user.save();
+//       const users = await Quiz.find({
+//         [`QuizCategory.${categoryName}.isPlayed`]: true,
+//       })
+//         .select("doctorName QuizCategory")
+//         .exec();
+
+//       // Extract doctor names and scores from the result
+//       let categoryLeaderboard = [];
+//       categoryLeaderboard = users.map((user) => ({
+//         doctorName: user.doctorName,
+//         score: user.QuizCategory[categoryName].TotalPoints,
+//       }));
+//       console.log(categoryLeaderboard);
+//       return res.status(200).json({
+//         msg: "QuizCategory updated successfully",
+//         categoryName,
+//         categoryLeaderboard,
+//       });
+//     } else {
+//       return res.status(404).json({ msg: "Category not found" });
+//     }
+//   } catch (error) {
+//     console.log("error: ", error);
+//     return res.status(400).json({ msg: "Internal Server Error", error });
+//   }
+// };
+
 exports.handleUserQuizSubmit = async (req, res) => {
   const userId = req.body.userId;
   const totalPoints = req.body.totalPoints;
   const categoryName = req.body.categoryName;
+
   try {
     const user = await Quiz.findById(userId);
-    console.log({ user });
+
     if (!user) {
       return res.status(401).json({ msg: "User not found" });
     }
 
-    if (user.QuizCategory && user.QuizCategory[categoryName]) {
-      const category = user.QuizCategory[categoryName];
+    console.log("Before update - user.quizCategories:", user.quizCategories);
 
-      if (category.isPlayed) {
-        return res.status(200).json({ msg: "Category already played" });
-      }
-
-      // Update the category as played and set the total points
-      category.isPlayed = true;
-      category.TotalPoints = totalPoints;
-
-      await user.save();
-      const users = await Quiz.find({
-        [`QuizCategory.${categoryName}.isPlayed`]: true,
-      })
-        .select("doctorName QuizCategory")
-        .exec();
-
-      // Extract doctor names and scores from the result
-      let categoryLeaderboard = [];
-      categoryLeaderboard = users.map((user) => ({
-        doctorName: user.doctorName,
-        score: user.QuizCategory[categoryName].TotalPoints,
-      }));
-      console.log(categoryLeaderboard);
-      return res.status(200).json({
-        msg: "QuizCategory updated successfully",
-        categoryName,
-        categoryLeaderboard,
-      });
-    } else {
-      return res.status(404).json({ msg: "Category not found" });
+    // Create quizCategories array if it doesn't exist
+    if (!user.quizCategories) {
+      user.quizCategories = [];
     }
+
+    console.log("After initializing - user.quizCategories:", user.quizCategories);
+
+    // Check if the category exists
+    const existingCategory = user.quizCategories.find(
+      (category) => category.categoryName === categoryName
+    );
+
+    if (!existingCategory) {
+      console.log(`Adding new category: ${categoryName}`);
+      // If the category doesn't exist, add it to the array
+      user.quizCategories.push({
+        categoryName,
+        isPlayed: false,
+        TotalPoints: 0,
+      });
+    } else if (existingCategory.isPlayed) {
+      return res.status(200).json({ msg: "Category already played" });
+    }
+
+    console.log("After updating - user.quizCategories:", user.quizCategories);
+
+    // Update the category as played and set the total points
+    const updatedCategory = user.quizCategories.find(
+      (category) => category.categoryName === categoryName
+    );
+    updatedCategory.isPlayed = true;
+    updatedCategory.TotalPoints = totalPoints;
+
+    await user.save();
+
+    const users = await Quiz.find({
+      "quizCategories.categoryName": categoryName,
+      "quizCategories.isPlayed": true,
+    })
+      .select("doctorName quizCategories")
+      .exec();
+
+    // Extract doctor names and scores from the result
+    let categoryLeaderboard = users.map((user) => ({
+      doctorName: user.doctorName,
+      score: user.quizCategories.find(
+        (category) => category.categoryName === categoryName
+      ).TotalPoints,
+    }));
+    console.log(categoryLeaderboard);
+
+    return res.status(200).json({
+      msg: "QuizCategory updated successfully",
+      categoryName,
+      categoryLeaderboard,
+    });
   } catch (error) {
     console.log("error: ", error);
     return res.status(400).json({ msg: "Internal Server Error", error });
   }
 };
+
+
+
+
+
+
+
+
+
+
 
 exports.handleLeaderBoardFilter = async (req, res) => {
   const state = req.body.state;
@@ -156,7 +242,6 @@ exports.handleLeaderBoardFilter = async (req, res) => {
 
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
   const categoryName = req.params.categoryName;
-
   try {
     if (!categoryName) {
       return res.status(400).json({
@@ -182,7 +267,10 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
       .select("doctorName QuizCategory state city")
       .exec();
 
-    // Extract doctor names and scores from the result
+
+
+
+    // Extract doctor names And scores From T`he result
     let categoryLeaderboard = [];
     console.log({ users });
     categoryLeaderboard = users.map((user) => ({
@@ -278,6 +366,46 @@ exports.handleOnlyNameWithId = async (req, res) => {
 // };
 
 
+// exports.handleUserCategory = async (req, res) => {
+//   const { userId } = req.params;
+
+//   try {
+//     if (!userId) {
+//       return res.status(401).json({
+//         msg: "User Id Required",
+//       });
+//     }
+
+//     const user = await Quiz.findById(userId).select("QuizCategory").lean();
+//     console.log("user", user);
+
+//     if (!user) {
+//       return res.status(401).json({
+//         msg: "No Game Category Found",
+//       });
+//     }
+
+//     const userCategories = user.QuizCategory;
+//     const formattedCategories = [];
+
+//     for (const category in userCategories) {
+//       formattedCategories.push({
+//         category: category, // Add the category name
+//         isPlayed: userCategories[category].isPlayed,
+//         TotalPoints: userCategories[category].TotalPoints,
+//       });
+//     }
+
+//     return res.status(200).json(formattedCategories);
+//   } catch (error) {
+//     return res.status(500).json({ // Use 500 for internal server error
+//       msg: "Internal Server Error",
+//     });
+//   }
+// };
+
+// const Quiz = require('path_to_your_quiz_model'); // Replace with the actual path
+
 exports.handleUserCategory = async (req, res) => {
   const { userId } = req.params;
 
@@ -288,7 +416,7 @@ exports.handleUserCategory = async (req, res) => {
       });
     }
 
-    const user = await Quiz.findById(userId).select("QuizCategory").lean();
+    const user = await Quiz.findById(userId).select("quizCategories").lean(); // Adjust the field name to match your schema
     console.log("user", user);
 
     if (!user) {
@@ -297,21 +425,23 @@ exports.handleUserCategory = async (req, res) => {
       });
     }
 
-    const userCategories = user.QuizCategory;
+    const userCategories = user.quizCategories;
     const formattedCategories = [];
 
-    for (const category in userCategories) {
+    for (const category of userCategories) {
       formattedCategories.push({
-        category: category, // Add the category name
-        isPlayed: userCategories[category].isPlayed,
-        TotalPoints: userCategories[category].TotalPoints,
+        categoryName: category.categoryName, // Adjust the property name
+        isPlayed: category.isPlayed,
+        TotalPoints: category.TotalPoints,
       });
     }
 
     return res.status(200).json(formattedCategories);
   } catch (error) {
-    return res.status(500).json({ // Use 500 for internal server error
+    console.error(error); // Log the error for debugging
+    return res.status(500).json({
       msg: "Internal Server Error",
     });
   }
 };
+

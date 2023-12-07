@@ -5,8 +5,6 @@ const { postDrData, getDoctorName, handleUserDataById, handleUserQuizSubmit, han
 
 
 
-
-
 router.post("/user", postDrData);
 router.get("/get/docter/name", getDoctorName);
 router.get("/get/users/:userId", handleUserDataById);
