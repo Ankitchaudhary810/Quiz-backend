@@ -2,7 +2,7 @@ const Quiz = require("../models/Quiz");
 const mrModel = require("../models/Mr");
 const axios = require("axios");
 exports.postDrData = async (req, res) => {
-  const { doctorName, city, state, mrId , scCode} = req.body;
+  const { doctorName, city, state, mrId , scCode , locality} = req.body;
 
   let mr = await mrModel.findById({ _id: mrId });
   if (!mr) return res.status(400).json({ msg: "MR Not Found" });
@@ -14,6 +14,7 @@ exports.postDrData = async (req, res) => {
     city: city,
     state: state,
     scCode: scCode,
+    locality: locality,
     mrReference: mr._id
   });
 
