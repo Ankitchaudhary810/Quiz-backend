@@ -187,9 +187,6 @@ exports.handleUserQuizSubmit = async (req, res) => {
 
 
 
-
-
-
 exports.handleLeaderBoardFilter = async (req, res) => {
   const state = req.body.state;
   const categoryName = req.body.categoryName;
@@ -378,39 +375,43 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
 
     for (const category of userCategories) {
       formattedCategories.push({
-        categoryName: category.categoryName, // Adjust the property name
+        categoryName: category.categoryName,
         isPlayed: category.isPlayed,
         TotalPoints: category.TotalPoints,
       });
     }
 
-    let questions = [];
-
     let OnlyActiveCategories = [];
     try {
       const response = await axios.get('https://backup-quiz-server.onrender.com/onlyactivecategories');
       OnlyActiveCategories = response.data;
-      console.log({ OnlyActiveCategories });
     } catch (error) {
       console.error(error);
     }
 
+    const onlyFourActiveQuestions = [];
+
+    await Promise.all(OnlyActiveCategories.map(async (Category) => {
+      let category = Category.name;
+      console.log({ category });
+
+      try {
+        const response = await axios.get(`https://backup-quiz-server.onrender.com/api/questionsfour?category=${category}`);
+        onlyFourActiveQuestions.push(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }));
+
+    let MultipleQuestions = [];
     try {
       const response = await axios.get('https://backup-quiz-server.onrender.com/api/questions');
-      questions = response.data;
+      MultipleQuestions = response.data;
     } catch (error) {
       console.error(error);
     }
 
-    let FourQuestion = [];
-    try {
-      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questionsfour');
-      FourQuestion = response.data;
-    } catch (error) {
-      console.error(error);
-    }
-
-    return res.status(200).json(OnlyActiveCategories);
+    return res.status(200).json({ formattedCategories, OnlyActiveCategories, onlyFourActiveQuestions, MultipleQuestions });
   } catch (error) {
     const err = error.message;
     console.error(error);
