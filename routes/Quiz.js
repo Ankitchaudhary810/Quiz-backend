@@ -10,7 +10,7 @@ router.get("/get/docter/name", getDoctorName);
 router.get("/get/users/:userId", handleUserDataById);
 router.post("/submit/score", handleUserQuizSubmit);
 router.post("/get/filter/leaderboard", handleLeaderBoardFilter);
-router.get("/get/leaderboard/:categoryName", handleLeaderFilterByCategoryName);
+router.get("/get/leaderboard/:categoryName/:mrId", handleLeaderFilterByCategoryName);
 router.get("/get/users-name-state-city", handleUsersStateAndName);
 router.post('/get/get-only-name-with-id', handleOnlyNameWithId);
 router.get("/get/user-category/:userId", handleUserCategory);

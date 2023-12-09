@@ -243,55 +243,44 @@ exports.handleLeaderBoardFilter = async (req, res) => {
 
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
   const categoryName = req.params.categoryName;
+  const { mrId } = req.params
+  console.log({ categoryName });
   try {
     if (!categoryName) {
       return res.status(400).json({
-        msg: "CategoryName is required",
+        msg: 'CategoryName is required',
       });
     }
 
-    // Check if the categoryName exists in the database
-    const category = await Quiz.findOne({
-      [`QuizCategory.${categoryName}`]: { $exists: true },
+    if (!mrId) {
+      return res.status(400).json({
+        msg: "mrId is required",
+      })
+    }
+    const users = await Quiz.find({
+      'quizCategories.categoryName': categoryName,
+      'quizCategories.isPlayed': true,
+      'mrReference': mrId,
     });
 
-    if (!category) {
-      return res.status(301).json({
-        msg: "CategoryName does not exist in the database",
-      });
-    }
-
-    // Find all users who have played the specified category
-    const users = await Quiz.find({
-      [`QuizCategory.${categoryName}.isPlayed`]: true,
-    })
-      .select("doctorName QuizCategory state city")
-      .exec();
-
-
-
-
-    // Extract doctor names And scores From T`he result
-    let categoryLeaderboard = [];
-    console.log({ users });
-    categoryLeaderboard = users.map((user) => ({
+    const categoryLeaderboard = users.map((user) => ({
       doctorName: user.doctorName,
       state: user.state,
-      city: user.city,
-      score: user.QuizCategory[categoryName].TotalPoints,
+      score: user.quizCategories[0].TotalPoints,
     }));
 
     return res.status(200).json({
-      msg: "Category leaderboard retrieved successfully",
+      msg: 'Category leaderboard retrieved successfully',
       categoryLeaderboard,
     });
   } catch (error) {
-    console.error("error:", error);
+    console.error('error:', error);
     return res.status(500).json({
-      msg: "Internal Server Error",
+      msg: 'Internal Server Error',
     });
   }
 };
+
 
 exports.handleUsersStateAndName = async (req, res) => {
   try {
@@ -325,85 +314,7 @@ exports.handleOnlyNameWithId = async (req, res) => {
   }
 };
 
-// exports.handleUserCategory = async (req, res) => {
-//   const { userId } = req.params;
 
-//   try {
-//     if (!userId) {
-//       return res.status(401).json({
-//         msg: "user Id Required",
-//       });
-//     }
-
-//     const user = await Quiz.findById(userId).select("QuizCategory").lean();
-//     console.log("user", user);
-
-//     if (!user) {
-//       return res.status(401).json({
-//         msg: "No Game Category Found",
-//       });
-//     }
-
-//     const userCategories = user.QuizCategory;
-//     const formattedCategories = [];
-
-//     for (const category in userCategories) {
-//       formattedCategories.push({
-//         [category]: {
-//           isPlayed: userCategories[category].isPlayed,
-//           TotalPoints: userCategories[category].TotalPoints,
-//         },
-//       });
-//     }
-
-//     return res.status(200).json(formattedCategories);
-//   } catch (error) {
-//     return res.status(501).json({
-//       msg: "Internal Server Error",
-//     });
-//   }
-// };
-
-
-// exports.handleUserCategory = async (req, res) => {
-//   const { userId } = req.params;
-
-//   try {
-//     if (!userId) {
-//       return res.status(401).json({
-//         msg: "User Id Required",
-//       });
-//     }
-
-//     const user = await Quiz.findById(userId).select("QuizCategory").lean();
-//     console.log("user", user);
-
-//     if (!user) {
-//       return res.status(401).json({
-//         msg: "No Game Category Found",
-//       });
-//     }
-
-//     const userCategories = user.QuizCategory;
-//     const formattedCategories = [];
-
-//     for (const category in userCategories) {
-//       formattedCategories.push({
-//         category: category, // Add the category name
-//         isPlayed: userCategories[category].isPlayed,
-//         TotalPoints: userCategories[category].TotalPoints,
-//       });
-//     }
-
-//     return res.status(200).json(formattedCategories);
-//   } catch (error) {
-//     return res.status(500).json({ // Use 500 for internal server error
-//       msg: "Internal Server Error",
-//     });
-//   }
-// };
-
-// const Quiz = require('path_to_your_quiz_model'); // Replace with the actual path
 
 exports.handleUserCategory = async (req, res) => {
   const { userId } = req.params;
@@ -458,8 +369,7 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
       });
     }
 
-    const user = await Quiz.findById(userId).select("quizCategories").lean(); // Adjust the field name to match your schema
-    console.log("user", user);
+    const user = await Quiz.findById(userId).select("quizCategories").lean();
 
     if (!user) {
       return res.status(401).json({
@@ -479,10 +389,19 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
     }
 
     let questions = [];
+
+    let OnlyActiveCategories = [];
+    try {
+      const response = await axios.get('https://backup-quiz-server.onrender.com/onlyactivecategories');
+      OnlyActiveCategories = response.data;
+      console.log({ OnlyActiveCategories });
+    } catch (error) {
+      console.error(error);
+    }
+
     try {
       const response = await axios.get('https://backup-quiz-server.onrender.com/api/questions');
       questions = response.data;
-      console.log("data: ", questions);
     } catch (error) {
       console.error(error);
     }
@@ -495,15 +414,7 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
       console.error(error);
     }
 
-    let OnlyActiveCategories = [];
-    try {
-      const response = await axios.get('https://backup-quiz-server.onrender.com/onlyactivecategories');
-      OnlyActiveCategories = response.data;
-    } catch (error) {
-      console.error(error);
-    }
-
-    return res.status(200).json({ formattedCategories, questions, FourQuestion, OnlyActiveCategories });
+    return res.status(200).json(OnlyActiveCategories);
   } catch (error) {
     const err = error.message;
     console.error(error);
