@@ -241,59 +241,38 @@ exports.handleLeaderBoardFilter = async (req, res) => {
     });
   }
 };
-
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
   const categoryName = req.params.categoryName;
+  console.log({ categoryName });
   try {
     if (!categoryName) {
       return res.status(400).json({
-        msg: "CategoryName is required",
+        msg: 'CategoryName is required',
       });
     }
 
-    // Check if the categoryName exists in the database
-    const category = await Quiz.findOne({
-      [`QuizCategory.${categoryName}`]: { $exists: true },
+    const users = await Quiz.find({
+      'quizCategories.categoryName': categoryName,
+      'quizCategories.isPlayed': true,
     });
 
-    if (!category) {
-      return res.status(301).json({
-        msg: "CategoryName does not exist in the database",
-      });
-    }
-
-    // Find all users who have played the specified category
-    const users = await Quiz.find({
-      [`QuizCategory.${categoryName}.isPlayed`]: true,
-    })
-      .select("doctorName QuizCategory state city")
-      .exec();
-
-
-
-
-    // Extract doctor names And scores From T`he result
-    let categoryLeaderboard = [];
-    console.log({ users });
-    categoryLeaderboard = users.map((user) => ({
+    const categoryLeaderboard = users.map((user) => ({
       doctorName: user.doctorName,
       state: user.state,
-      city: user.city,
-      score: user.QuizCategory[categoryName].TotalPoints,
+      score: user.quizCategories[0].TotalPoints,
     }));
 
     return res.status(200).json({
-      msg: "Category leaderboard retrieved successfully",
+      msg: 'Category leaderboard retrieved successfully',
       categoryLeaderboard,
     });
   } catch (error) {
-    console.error("error:", error);
+    console.error('error:', error);
     return res.status(500).json({
-      msg: "Internal Server Error",
+      msg: 'Internal Server Error',
     });
   }
 };
-
 exports.handleUsersStateAndName = async (req, res) => {
   try {
     const doctorDetails = await Quiz.find().select(
