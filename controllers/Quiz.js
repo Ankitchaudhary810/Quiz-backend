@@ -190,10 +190,6 @@ exports.handleUserQuizSubmit = async (req, res) => {
 
 
 
-
-
-
-
 exports.handleLeaderBoardFilter = async (req, res) => {
   const state = req.body.state;
   const categoryName = req.body.categoryName;
