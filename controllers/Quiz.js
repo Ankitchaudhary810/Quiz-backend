@@ -243,6 +243,7 @@ exports.handleLeaderBoardFilter = async (req, res) => {
 
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
   const categoryName = req.params.categoryName;
+  const { mrId } = req.params
   console.log({ categoryName });
   try {
     if (!categoryName) {
@@ -251,9 +252,15 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
       });
     }
 
+    if (!mrId) {
+      return res.status(400).json({
+        msg: "mrId is required",
+      })
+    }
     const users = await Quiz.find({
       'quizCategories.categoryName': categoryName,
       'quizCategories.isPlayed': true,
+      'mrReference': mrId,
     });
 
     const categoryLeaderboard = users.map((user) => ({
@@ -307,85 +314,7 @@ exports.handleOnlyNameWithId = async (req, res) => {
   }
 };
 
-// exports.handleUserCategory = async (req, res) => {
-//   const { userId } = req.params;
 
-//   try {
-//     if (!userId) {
-//       return res.status(401).json({
-//         msg: "user Id Required",
-//       });
-//     }
-
-//     const user = await Quiz.findById(userId).select("QuizCategory").lean();
-//     console.log("user", user);
-
-//     if (!user) {
-//       return res.status(401).json({
-//         msg: "No Game Category Found",
-//       });
-//     }
-
-//     const userCategories = user.QuizCategory;
-//     const formattedCategories = [];
-
-//     for (const category in userCategories) {
-//       formattedCategories.push({
-//         [category]: {
-//           isPlayed: userCategories[category].isPlayed,
-//           TotalPoints: userCategories[category].TotalPoints,
-//         },
-//       });
-//     }
-
-//     return res.status(200).json(formattedCategories);
-//   } catch (error) {
-//     return res.status(501).json({
-//       msg: "Internal Server Error",
-//     });
-//   }
-// };
-
-
-// exports.handleUserCategory = async (req, res) => {
-//   const { userId } = req.params;
-
-//   try {
-//     if (!userId) {
-//       return res.status(401).json({
-//         msg: "User Id Required",
-//       });
-//     }
-
-//     const user = await Quiz.findById(userId).select("QuizCategory").lean();
-//     console.log("user", user);
-
-//     if (!user) {
-//       return res.status(401).json({
-//         msg: "No Game Category Found",
-//       });
-//     }
-
-//     const userCategories = user.QuizCategory;
-//     const formattedCategories = [];
-
-//     for (const category in userCategories) {
-//       formattedCategories.push({
-//         category: category, // Add the category name
-//         isPlayed: userCategories[category].isPlayed,
-//         TotalPoints: userCategories[category].TotalPoints,
-//       });
-//     }
-
-//     return res.status(200).json(formattedCategories);
-//   } catch (error) {
-//     return res.status(500).json({ // Use 500 for internal server error
-//       msg: "Internal Server Error",
-//     });
-//   }
-// };
-
-// const Quiz = require('path_to_your_quiz_model'); // Replace with the actual path
 
 exports.handleUserCategory = async (req, res) => {
   const { userId } = req.params;
