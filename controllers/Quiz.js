@@ -1,8 +1,8 @@
 const Quiz = require("../models/Quiz");
 const mrModel = require("../models/Mr");
-const axios = require("axios")
+const axios = require("axios");
 exports.postDrData = async (req, res) => {
-  const { doctorName, city, state, mrId , scCode } = req.body;
+  const { doctorName, city, state, mrId } = req.body;
 
   let mr = await mrModel.findById({ _id: mrId });
   if (!mr) return res.status(400).json({ msg: "MR Not Found" });
@@ -12,7 +12,6 @@ exports.postDrData = async (req, res) => {
     doctorName: doctorName,
     city: city,
     state: state,
-    scCode: scCode,
     mrReference: mr._id
   });
 
@@ -241,6 +240,7 @@ exports.handleLeaderBoardFilter = async (req, res) => {
     });
   }
 };
+
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
   const categoryName = req.params.categoryName;
   console.log({ categoryName });
@@ -273,6 +273,8 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
     });
   }
 };
+
+
 exports.handleUsersStateAndName = async (req, res) => {
   try {
     const doctorDetails = await Quiz.find().select(
@@ -289,9 +291,7 @@ exports.handleUsersStateAndName = async (req, res) => {
 exports.handleOnlyNameWithId = async (req, res) => {
   try {
     const { mrId } = req.body;
-
-    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName');
-
+    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName locality scCode');
     if (!doctors || doctors.length === 0) {
       return res.status(404).json({
         msg: 'No Doctors Found for the specified MR',
@@ -440,8 +440,7 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
       });
     }
 
-    const user = await Quiz.findById(userId).select("quizCategories").lean(); // Adjust the field name to match your schema
-    console.log("user", user);
+    const user = await Quiz.findById(userId).select("quizCategories").lean();
 
     if (!user) {
       return res.status(401).json({
@@ -461,31 +460,32 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
     }
 
     let questions = [];
+
+    let OnlyActiveCategories = [];
+    try {
+      const response = await axios.get('https://backup-quiz-server.onrender.com/onlyactivecategories');
+      OnlyActiveCategories = response.data;
+      console.log({ OnlyActiveCategories });
+    } catch (error) {
+      console.error(error);
+    }
+
     try {
       const response = await axios.get('https://backup-quiz-server.onrender.com/api/questions');
       questions = response.data;
-      console.log("data: ", questions);
     } catch (error) {
       console.error(error);
     }
 
     let FourQuestion = [];
     try {
-      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questionfour');
+      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questionsfour');
       FourQuestion = response.data;
     } catch (error) {
       console.error(error);
     }
 
-    let OnlyActiveCategories = [];
-    try {
-      const response = await axios.get('https://backup-quiz-server.onrender.com/onlyactivecategories');
-      OnlyActiveCategories = response.data;
-    } catch (error) {
-      console.error(error);
-    }
-
-    return res.status(200).json({ formattedCategories, questions, FourQuestion, OnlyActiveCategories });
+    return res.status(200).json(OnlyActiveCategories);
   } catch (error) {
     const err = error.message;
     console.error(error);
