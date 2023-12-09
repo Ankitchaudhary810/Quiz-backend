@@ -17,7 +17,7 @@ const mrSchema = new mongosoe.Schema({
     },
     EMAIL: {
         type: String,
-        //  required: true,
+        // required: true,
         // unique: true,
     },
     ROLE: {
@@ -42,11 +42,8 @@ const mrSchema = new mongosoe.Schema({
         type: String,
         // required:true
     },
-    SCCODE: {
-        type: String,
-        // required:true,
-        // unique:true
-    },
+
+
 
     loginLogs: [
         {

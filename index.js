@@ -32,7 +32,7 @@ conn.once('open', () => {
 
 
 app.get('/', (req, res) => {
-  return res.send("<p>QUIZ's Backend</p>")
+  return res.send(" <p>QUIZ's Backend</p>")
 })
 
 const QuizRoutes = require("./routes/Quiz");

@@ -1,6 +1,6 @@
 const Quiz = require("../models/Quiz");
 const mrModel = require("../models/Mr");
-const axios = require("axios")
+const axios = require("axios");
 exports.postDrData = async (req, res) => {
   const { doctorName, city, state, mrId } = req.body;
 
@@ -309,9 +309,7 @@ exports.handleUsersStateAndName = async (req, res) => {
 exports.handleOnlyNameWithId = async (req, res) => {
   try {
     const { mrId } = req.body;
-
-    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName');
-
+    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName locality scCode');
     if (!doctors || doctors.length === 0) {
       return res.status(404).json({
         msg: 'No Doctors Found for the specified MR',
@@ -491,7 +489,7 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
 
     let FourQuestion = [];
     try {
-      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questionfour');
+      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questionsfour');
       FourQuestion = response.data;
     } catch (error) {
       console.error(error);
