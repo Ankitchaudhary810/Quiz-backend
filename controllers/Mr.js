@@ -204,7 +204,68 @@ const handleAdminSideReports = async (req, res) => {
     }
 };
 
+const handleAllMrDoctorsData = async (req, res) => {
+    try {
+        const mrsAndDoctors = await mrModel.aggregate([
+            {
+                $lookup: {
+                    from: 'quizzes',
+                    localField: '_id',
+                    foreignField: 'mrReference',
+                    as: 'doctors',
+                },
+            },
+            {
+                $unwind: '$doctors',
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    USERNAME: { $first: '$USERNAME' },
+                    MRID: { $first: '$MRID' },
+                    PASSWORD: { $first: '$PASSWORD' },
+                    EMAIL: { $first: '$EMAIL' },
+                    ROLE: { $first: '$ROLE' },
+                    HQ: { $first: '$HQ' },
+                    REGION: { $first: '$REGION' },
+                    BUSINESSUNIT: { $first: '$BUSINESSUNIT' },
+                    DOJ: { $first: '$DOJ' },
+                    LOGINLOGS: { $sum: { $size: '$loginLogs' } },
+                    doctors: {
+                        $push: {
+                            doctorName: '$doctors.doctorName',
+                            scCode: '$doctors.scCode',
+                            city: '$doctors.city',
+                            state: '$doctors.state',
+                        },
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    USERNAME: 1,
+                    MRID: 1,
+                    PASSWORD: 1,
+                    EMAIL: 1,
+                    ROLE: 1,
+                    HQ: 1,
+                    REGION: 1,
+                    BUSINESSUNIT: 1,
+                    DOJ: 1,
+                    LOGINLOGS: 1,
+                    doctors: 1,
+                },
+            },
+        ]);
 
+        return res.json(mrsAndDoctors);
+    } catch (error) {
+        console.error(error);
+        const errMsg = error.message;
+        return res.status(500).json({ success: false, errMsg, error: 'Internal Server Error' });
+    }
+};
 
 
 
@@ -213,5 +274,6 @@ module.exports = {
     loginMr,
     GetDoctorsByMR,
     handleSheetUpload,
-    handleAdminSideReports
+    handleAdminSideReports,
+    handleAllMrDoctorsData
 }

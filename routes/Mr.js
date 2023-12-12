@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const upload = multer({ dest: 'uploads/' });
 
-const { createMr, loginMr, GetDoctorsByMR, handleSheetUpload, handleAdminSideReports } = require("../controllers/Mr")
+const { createMr, loginMr, GetDoctorsByMR, handleSheetUpload, handleAdminSideReports, handleAllMrDoctorsData } = require("../controllers/Mr")
 
 
 router.post("/create-mr", createMr);
@@ -17,6 +17,8 @@ router.post("/upload-sheet", upload.single('file'), handleSheetUpload);
 
 
 router.get("/admin-side-reports", handleAdminSideReports);
+
+router.get("/get-all-doctor-mrs-data", handleAllMrDoctorsData);
 
 
 
