@@ -316,9 +316,7 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
         msg: "User Id Required",
       });
     }
-
     const user = await Quiz.findById(userId).select("quizCategories").lean();
-
     if (!user) {
       return res.status(401).json({
         msg: "No Game Category Found",
@@ -327,7 +325,6 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
 
     const userCategories = user.quizCategories;
     const formattedCategories = [];
-
     for (const category of userCategories) {
       formattedCategories.push({
         categoryName: category.categoryName,

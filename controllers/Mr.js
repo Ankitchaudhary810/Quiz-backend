@@ -134,10 +134,8 @@ const GetDoctorsByMR = async (req, res) => {
 
     const mrId = req.params.id;
     try {
-        // Find doctors with the specified mrReference
         const doctors = await Quiz.find({ mrReference: mrId });
 
-        // Return the list of doctors
         return res.json({ doctors });
     } catch (error) {
         console.error(error);
@@ -220,7 +218,7 @@ const handleAllMrDoctorsData = async (req, res) => {
             },
             {
                 $group: {
-                    _id: '$_id',
+                    _id: '$_id', // Group by MR ID
                     USERNAME: { $first: '$USERNAME' },
                     MRID: { $first: '$MRID' },
                     PASSWORD: { $first: '$PASSWORD' },
@@ -242,6 +240,9 @@ const handleAllMrDoctorsData = async (req, res) => {
                 },
             },
             {
+                $unwind: '$doctors',
+            },
+            {
                 $project: {
                     _id: 0,
                     USERNAME: 1,
@@ -254,18 +255,43 @@ const handleAllMrDoctorsData = async (req, res) => {
                     BUSINESSUNIT: 1,
                     DOJ: 1,
                     LOGINLOGS: 1,
-                    doctors: 1,
+                    doctorName: '$doctors.doctorName',
+                    scCode: '$doctors.scCode',
+                    city: '$doctors.city',
+                    state: '$doctors.state',
                 },
             },
         ]);
 
-        return res.json(mrsAndDoctors);
+        const header = [
+            'USERNAME',
+            'MRID',
+            'PASSWORD',
+            'EMAIL',
+            'ROLE',
+            'HQ',
+            'REGION',
+            'BUSINESSUNIT',
+            'DOJ',
+            'LOGINLOGS',
+            'doctorName',
+            'scCode',
+            'city',
+            'state',
+        ];
+
+        const rows = mrsAndDoctors.map((row) => header.map((field) => row[field]));
+
+        const result = [...rows];
+
+        return res.json(result);
     } catch (error) {
         console.error(error);
         const errMsg = error.message;
         return res.status(500).json({ success: false, errMsg, error: 'Internal Server Error' });
     }
 };
+
 
 
 
