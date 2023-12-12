@@ -2,12 +2,12 @@ const Quiz = require("../models/Quiz");
 const mrModel = require("../models/Mr");
 const axios = require("axios");
 exports.postDrData = async (req, res) => {
-  const { doctorName, city, state, mrId , scCode , locality} = req.body;
+  const { doctorName, city, state, mrId, scCode, locality } = req.body;
 
   let mr = await mrModel.findById({ _id: mrId });
   if (!mr) return res.status(400).json({ msg: "MR Not Found" });
-  let doctor = await Quiz.findOne({scCode});
-  if(doctor) return res.status(400).json({msg:"Same scCode is find in the database"});
+  let doctor = await Quiz.findOne({ scCode });
+  if (doctor) return res.status(400).json({ msg: "Same scCode is find in the database" });
   console.log({ mr });
   const newDoctor = new Quiz({
     doctorName: doctorName,
@@ -61,55 +61,6 @@ exports.handleUserDataById = async (req, res) => {
   }
 };
 
-// exports.handleUserQuizSubmit = async (req, res) => {
-//   const userId = req.body.userId;
-//   const totalPoints = req.body.totalPoints;
-//   const categoryName = req.body.categoryName;
-//   try {
-//     const user = await Quiz.findById(userId);
-//     console.log({ user });
-//     if (!user) {
-//       return res.status(401).json({ msg: "User not found" });
-//     }
-
-//     if (user.QuizCategory && user.QuizCategory[categoryName]) {
-//       const category = user.QuizCategory[categoryName];
-
-//       if (category.isPlayed) {
-//         return res.status(200).json({ msg: "Category already played" });
-//       }
-
-//       // Update the category as played and set the total points
-//       category.isPlayed = true;
-//       category.TotalPoints = totalPoints;
-
-//       await user.save();
-//       const users = await Quiz.find({
-//         [`QuizCategory.${categoryName}.isPlayed`]: true,
-//       })
-//         .select("doctorName QuizCategory")
-//         .exec();
-
-//       // Extract doctor names and scores from the result
-//       let categoryLeaderboard = [];
-//       categoryLeaderboard = users.map((user) => ({
-//         doctorName: user.doctorName,
-//         score: user.QuizCategory[categoryName].TotalPoints,
-//       }));
-//       console.log(categoryLeaderboard);
-//       return res.status(200).json({
-//         msg: "QuizCategory updated successfully",
-//         categoryName,
-//         categoryLeaderboard,
-//       });
-//     } else {
-//       return res.status(404).json({ msg: "Category not found" });
-//     }
-//   } catch (error) {
-//     console.log("error: ", error);
-//     return res.status(400).json({ msg: "Internal Server Error", error });
-//   }
-// };
 
 exports.handleUserQuizSubmit = async (req, res) => {
   const userId = req.body.userId;
@@ -294,12 +245,13 @@ exports.handleUsersStateAndName = async (req, res) => {
 exports.handleOnlyNameWithId = async (req, res) => {
   try {
     const { mrId } = req.body;
-    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName locality scCode');
+    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName scCode locality');
     if (!doctors || doctors.length === 0) {
       return res.status(404).json({
         msg: 'No Doctors Found for the specified MR',
       });
     }
+    console.log({ doctors })
 
     return res.status(200).json(doctors);
   } catch (e) {

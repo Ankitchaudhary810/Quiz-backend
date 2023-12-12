@@ -26,6 +26,6 @@ const doctorSchema = mongoose.Schema({
 
 const Quiz = mongoose.model("Quiz", doctorSchema);
 
-module.exports = Quiz;
+module.exports = Quiz
 
 

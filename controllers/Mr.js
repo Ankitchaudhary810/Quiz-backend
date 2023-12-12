@@ -18,6 +18,7 @@ const handleSheetUpload = async (req, res) => {
                     scCode: row.scCode,
                     city: row.city,
                     state: row.state,
+                    locality: row.locality,
                     mrReference: existingMr._id
                 })
                 await existingMr.save();
@@ -41,6 +42,7 @@ const handleSheetUpload = async (req, res) => {
                     scCode: row.scCode,
                     city: row.city,
                     state: row.state,
+                    locality: row.locality,
                     mrReference: newMr._id
                 })
                 await newDoctor.save();
@@ -131,8 +133,6 @@ const loginMr = async (req, res) => {
 const GetDoctorsByMR = async (req, res) => {
 
     const mrId = req.params.id;
-
-
     try {
         // Find doctors with the specified mrReference
         const doctors = await Quiz.find({ mrReference: mrId });
@@ -146,6 +146,66 @@ const GetDoctorsByMR = async (req, res) => {
 };
 
 
+const handleAdminSideReports = async (req, res) => {
+    try {
+        const doctors = await Quiz.find({});
+        const mrs = await mrModel.find({});
+
+        let mostPlayedCategoryName = '';
+        let maxTotalPoints = 0;
+
+        let lowestPlayedCategoryName = '';
+        let minTotalPoints = 120000;
+
+        doctors.forEach((doctor) => {
+            doctor.quizCategories.forEach((category) => {
+                if (category.TotalPoints > maxTotalPoints) {
+                    maxTotalPoints = category.TotalPoints;
+                    mostPlayedCategoryName = category.categoryName;
+                }
+
+                if (category.TotalPoints < minTotalPoints) {
+                    minTotalPoints = category.TotalPoints;
+                    lowestPlayedCategoryName = category.categoryName;
+                }
+            });
+        });
+
+        let mostLoginLogsMR = null;
+        let maxLoginLogsCount = -1;
+
+        // Find MR with the most login logs
+        mrs.forEach((mr) => {
+            const loginLogsCount = mr.loginLogs.length;
+            if (loginLogsCount > maxLoginLogsCount) {
+                maxLoginLogsCount = loginLogsCount;
+                mostLoginLogsMR = {
+                    USERNAME: mr.USERNAME,
+                    MRID: mr.MRID,
+                    loginLogsCount: loginLogsCount,
+                };
+            }
+        });
+
+        const adminReports = {
+            doctors: doctors.length,
+            mrs: mrs.length,
+            mostPlayedCategory: mostPlayedCategoryName,
+            maxTotalPoints: maxTotalPoints,
+            lowestPlayedCategory: lowestPlayedCategoryName,
+            minTotalPoints: minTotalPoints,
+            mostLoginLogsMR: mostLoginLogsMR,
+        };
+
+        res.json(adminReports);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
+
 
 
 module.exports = {
@@ -153,4 +213,5 @@ module.exports = {
     loginMr,
     GetDoctorsByMR,
     handleSheetUpload,
+    handleAdminSideReports
 }
