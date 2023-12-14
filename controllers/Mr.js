@@ -293,6 +293,102 @@ const handleAllMrDoctorsData = async (req, res) => {
 };
 
 
+const handleAllMrDoctorsDataV2 = async (req, res) => {
+    try {
+        const mrsAndDoctors = await mrModel.aggregate([
+            {
+                $lookup: {
+                    from: 'quizzes',
+                    localField: '_id',
+                    foreignField: 'mrReference',
+                    as: 'doctors',
+                },
+            },
+            {
+                $unwind: { path: '$doctors', preserveNullAndEmptyArrays: true },
+            },
+            {
+                $group: {
+                    _id: '$_id', // Group by MR ID
+                    USERNAME: { $first: '$USERNAME' },
+                    MRID: { $first: '$MRID' },
+                    PASSWORD: { $first: '$PASSWORD' },
+                    EMAIL: { $first: '$EMAIL' },
+                    ROLE: { $first: '$ROLE' },
+                    HQ: { $first: '$HQ' },
+                    REGION: { $first: '$REGION' },
+                    BUSINESSUNIT: { $first: '$BUSINESSUNIT' },
+                    DOJ: { $first: '$DOJ' },
+                    LOGINLOGS: { $sum: { $size: '$loginLogs' } },
+                    doctors: {
+                        $push: {
+                            doctorName: '$doctors.doctorName',
+                            scCode: '$doctors.scCode',
+                            city: '$doctors.city',
+                            state: '$doctors.state',
+                            quizCategories: {
+                                $ifNull: ['$doctors.quizCategories', []], // Handle null case
+                            },
+                        },
+                    },
+                },
+            },
+            {
+                $project: {
+                    _id: 0,
+                    USERNAME: 1,
+                    MRID: 1,
+                    PASSWORD: 1,
+                    EMAIL: 1,
+                    ROLE: 1,
+                    HQ: 1,
+                    REGION: 1,
+                    BUSINESSUNIT: 1,
+                    DOJ: 1,
+                    LOGINLOGS: 1,
+                    doctors: 1,
+                },
+            },
+        ]);
+
+        const header = [
+            'USERNAME',
+            'MRID',
+            'PASSWORD',
+            'EMAIL',
+            'ROLE',
+            'HQ',
+            'REGION',
+            'BUSINESSUNIT',
+            'DOJ',
+            'LOGINLOGS',
+            'doctors',
+        ];
+
+        const rows = mrsAndDoctors.map((row) => {
+            const rowData = header.map((field) => row[field]);
+            const doctorsData = rowData.pop(); // Remove 'doctors' from the end
+            return [...rowData, ...doctorsData.map((doctor) => {
+                return {
+                    ...doctor,
+                    quizCategories: doctor.quizCategories.map((category) => ({
+                        categoryName: category.categoryName,
+                        score: category.TotalPoints || 0,
+                    })),
+                };
+            })];
+        });
+
+        const result = [...rows];
+
+        return res.json(result);
+    } catch (error) {
+        console.error(error);
+        const errMsg = error.message;
+        return res.status(500).json({ success: false, errMsg, error: 'Internal Server Error' });
+    }
+};
+
 
 
 module.exports = {
@@ -301,5 +397,7 @@ module.exports = {
     GetDoctorsByMR,
     handleSheetUpload,
     handleAdminSideReports,
-    handleAllMrDoctorsData
+    handleAllMrDoctorsData,
+    handleAllMrDoctorsDataV2,
+
 }
