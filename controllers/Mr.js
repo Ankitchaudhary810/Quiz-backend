@@ -3,7 +3,7 @@ const Quiz = require("../models/Quiz");
 const fs = require("fs");
 const csv = require('csv-parser');
 const xlsx = require('xlsx');
-
+const sendMail = require("../utility/sendMail")
 const handleSheetUpload = async (req, res) => {
     try {
         const workbook = xlsx.readFile(req.file.path);
@@ -391,6 +391,56 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
 
 
 
+
+const handleForgetPassword = async (req, res) => {
+    try {
+
+        const mrId = req.body.mrId;
+        const mr = await mrModel.findOne({ MRID: mrId });
+        if (!mr) {
+            return res.status(400).json({
+                success: false,
+                msg: "Mr Not Found",
+            })
+        }
+
+        const message = `
+        Hello , ${mr.USERNAME} Your Password For Quiz Application is ${mr.PASSWORD}.
+        `
+
+        const messageToBeSend = await sendMail(mr.EMAIL, 'Quiz Application Password', message);
+
+        console.log({ messageToBeSend });
+
+        const mrMail = maskEmail(mr.EMAIL);
+
+
+
+        return res.status(200).json({
+            success: true,
+            mrMail: mrMail,
+            msg: `We Will Send Password To This mail ${mrMail}, Kindly Check Junk And SPAM Folder`
+        })
+
+    } catch (error) {
+        console.log("Error in CreateMr");
+        let err = error.message
+        return res.status(500).json({
+            msg: "Internal Server Error",
+            err
+        });
+    }
+}
+
+
+function maskEmail(email) {
+    const [username, domain] = email.split('@');
+    const maskedUsername = username[0] + username[1] + '*'.repeat(username.length - 2) + username.slice(-1);
+    return `${maskedUsername}@${domain}`;
+}
+
+
+
 module.exports = {
     createMr,
     loginMr,
@@ -399,5 +449,5 @@ module.exports = {
     handleAdminSideReports,
     handleAllMrDoctorsData,
     handleAllMrDoctorsDataV2,
-
+    handleForgetPassword,
 }
