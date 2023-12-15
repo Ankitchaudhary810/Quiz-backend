@@ -325,6 +325,7 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                             doctorName: '$doctors.doctorName',
                             scCode: '$doctors.scCode',
                             city: '$doctors.city',
+                            locality: '$doctors.locality',
                             state: '$doctors.state',
                             quizCategories: {
                                 $ifNull: ['$doctors.quizCategories', []], // Handle null case
@@ -365,12 +366,14 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                 row.LOGINLOGS,
             ];
 
+
             const doctorsData = row.doctors.map((doctor) => {
                 return [
                     ...mrData,
                     doctor.doctorName,
                     doctor.scCode || '',
                     doctor.city || '',
+                    doctor.locality || '',
                     doctor.state || '',
                     ...(doctor.quizCategories.map((category) => [
                         category.categoryName,
