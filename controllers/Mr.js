@@ -309,7 +309,7 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
             },
             {
                 $group: {
-                    _id: '$_id', // Group by MR ID
+                    _id: '$_id',
                     USERNAME: { $first: '$USERNAME' },
                     MRID: { $first: '$MRID' },
                     PASSWORD: { $first: '$PASSWORD' },
@@ -328,7 +328,7 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                             locality: '$doctors.locality',
                             state: '$doctors.state',
                             quizCategories: {
-                                $ifNull: ['$doctors.quizCategories', []], // Handle null case
+                                $ifNull: ['$doctors.quizCategories', []],
                             },
                         },
                     },
@@ -365,9 +365,16 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                 row.DOJ,
                 row.LOGINLOGS,
             ];
-
-
             const doctorsData = row.doctors.map((doctor) => {
+                const categoryCount = doctor.quizCategories.length;
+                const totalCategoryPlayed = {
+                    "TotalCategoryPlayed": categoryCount
+                }
+
+                const categoryData = doctor.quizCategories.map((category) => {
+                    return [{ "categoryName": category.categoryName, "Points": category.TotalPoints || 0 }];
+                });
+
                 return [
                     ...mrData,
                     doctor.doctorName,
@@ -375,10 +382,8 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                     doctor.city || '',
                     doctor.locality || '',
                     doctor.state || '',
-                    ...(doctor.quizCategories.map((category) => [
-                        category.categoryName,
-                        category.TotalPoints || 0,
-                    ]) || []),
+                    ...categoryData,
+                    totalCategoryPlayed,
                 ];
             });
 
@@ -392,7 +397,6 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
         return res.status(500).json({ success: false, errMsg, error: 'Internal Server Error' });
     }
 };
-
 
 
 
