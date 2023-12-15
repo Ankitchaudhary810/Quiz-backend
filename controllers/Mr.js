@@ -351,37 +351,38 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
             },
         ]);
 
-        const header = [
-            'USERNAME',
-            'MRID',
-            'PASSWORD',
-            'EMAIL',
-            'ROLE',
-            'HQ',
-            'REGION',
-            'BUSINESSUNIT',
-            'DOJ',
-            'LOGINLOGS',
-            'doctors',
-        ];
+        const rows = mrsAndDoctors.flatMap((row) => {
+            const mrData = [
+                row.USERNAME,
+                row.MRID,
+                row.PASSWORD,
+                row.EMAIL,
+                row.ROLE,
+                row.HQ,
+                row.REGION,
+                row.BUSINESSUNIT,
+                row.DOJ,
+                row.LOGINLOGS,
+            ];
 
-        const rows = mrsAndDoctors.map((row) => {
-            const rowData = header.map((field) => row[field]);
-            const doctorsData = rowData.pop(); // Remove 'doctors' from the end
-            return [...rowData, ...doctorsData.map((doctor) => {
-                return {
-                    ...doctor,
-                    quizCategories: doctor.quizCategories.map((category) => ({
-                        categoryName: category.categoryName,
-                        score: category.TotalPoints || 0,
-                    })),
-                };
-            })];
+            const doctorsData = row.doctors.map((doctor) => {
+                return [
+                    ...mrData,
+                    doctor.doctorName,
+                    doctor.scCode || '',
+                    doctor.city || '',
+                    doctor.state || '',
+                    ...(doctor.quizCategories.map((category) => [
+                        category.categoryName,
+                        category.TotalPoints || 0,
+                    ]) || []),
+                ];
+            });
+
+            return doctorsData;
         });
 
-        const result = [...rows];
-
-        return res.json(result);
+        return res.json(rows);
     } catch (error) {
         console.error(error);
         const errMsg = error.message;

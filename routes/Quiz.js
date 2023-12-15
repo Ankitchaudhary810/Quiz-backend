@@ -19,9 +19,4 @@ router.get("/get/user-category-with-mulquestions-fourquestions/:userId", handleU
 
 
 
-
-
-
-
-
 module.exports = router
