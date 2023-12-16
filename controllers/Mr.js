@@ -466,12 +466,50 @@ const handleTopCategoryChart = async (req, res) => {
     }
 };
 
-
-
-
 const handleTopMrByDoctor = async (req, res) => {
+    try {
+        const result = await mrModel.aggregate([
+            {
+                $lookup: {
+                    from: 'quizzes',
+                    localField: '_id',
+                    foreignField: 'mrReference',
+                    as: 'doctors',
+                },
+            },
+            {
+                $addFields: {
+                    doctorCount: { $size: '$doctors' },
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    MRID: 1,
+                    USERNAME: 1,
+                    doctorCount: 1,
+                },
+            },
+            {
+                $sort: { doctorCount: -1 },
+            },
+            {
+                $limit: 5,
+            },
+        ]);
 
-}
+        return res.json(result);
+    } catch (error) {
+        console.log('Error in handleTopMrByDoctor');
+        let err = error.message;
+        return res.status(500).json({
+            msg: 'Internal Server Error',
+            err,
+        });
+    }
+};
+
+
 
 
 
