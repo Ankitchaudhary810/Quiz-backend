@@ -3,7 +3,9 @@ const Quiz = require("../models/Quiz");
 const fs = require("fs");
 const csv = require('csv-parser');
 const xlsx = require('xlsx');
-const sendMail = require("../utility/sendMail")
+const sendMail = require("../utility/sendMail");
+const { maskEmail } = require("../utility/maskEmail");
+
 const handleSheetUpload = async (req, res) => {
     try {
         const workbook = xlsx.readFile(req.file.path);
@@ -56,8 +58,6 @@ const handleSheetUpload = async (req, res) => {
     }
 };
 
-
-
 const createMr = async (req, res) => {
     try {
         const { USERNAME, MRID, PASSWORD, EMAIL, ROLE, HQ, REGION, BUSINESSUNIT, DOJ, SCCODE } = req.body;
@@ -91,7 +91,6 @@ const createMr = async (req, res) => {
         });
     }
 }
-
 
 const loginMr = async (req, res) => {
 
@@ -129,7 +128,6 @@ const loginMr = async (req, res) => {
     }
 }
 
-
 const GetDoctorsByMR = async (req, res) => {
 
     const mrId = req.params.id;
@@ -142,7 +140,6 @@ const GetDoctorsByMR = async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 };
-
 
 const handleAdminSideReports = async (req, res) => {
     try {
@@ -292,7 +289,6 @@ const handleAllMrDoctorsData = async (req, res) => {
     }
 };
 
-
 const handleAllMrDoctorsDataV2 = async (req, res) => {
     try {
         const mrsAndDoctors = await mrModel.aggregate([
@@ -398,8 +394,6 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
     }
 };
 
-
-
 const handleForgetPassword = async (req, res) => {
     try {
 
@@ -431,7 +425,7 @@ const handleForgetPassword = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("Error in CreateMr");
+        console.log("Error in handleForgetPassword");
         let err = error.message
         return res.status(500).json({
             msg: "Internal Server Error",
@@ -440,11 +434,43 @@ const handleForgetPassword = async (req, res) => {
     }
 }
 
+const handleTopCategoryChart = async (req, res) => {
+    try {
+        const result = await Quiz.aggregate([
+            {
+                $unwind: "$quizCategories"
+            },
+            {
+                $group: {
+                    _id: "$quizCategories.categoryName",
+                    Count: { $sum: 1 }
+                }
+            },
+            {
+                $project: {
+                    categoryName: "$_id",
+                    Count: 1,
+                    _id: 0
+                }
+            }
+        ]);
 
-function maskEmail(email) {
-    const [username, domain] = email.split('@');
-    const maskedUsername = username[0] + username[1] + '*'.repeat(username.length - 2) + username.slice(-1);
-    return `${maskedUsername}@${domain}`;
+        return res.json(result);
+    } catch (error) {
+        console.log("Error in handleTopCategoryChart");
+        let err = error.message;
+        return res.status(500).json({
+            msg: "Internal Server Error",
+            err
+        });
+    }
+};
+
+
+
+
+const handleTopMrByDoctor = async (req, res) => {
+
 }
 
 
@@ -458,4 +484,6 @@ module.exports = {
     handleAllMrDoctorsData,
     handleAllMrDoctorsDataV2,
     handleForgetPassword,
+    handleTopMrByDoctor,
+    handleTopCategoryChart
 }
