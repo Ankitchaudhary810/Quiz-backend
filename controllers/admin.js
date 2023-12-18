@@ -1,7 +1,4 @@
 
-
-
-
 const AdminModel = require("../models/admin");
 
 
@@ -81,8 +78,67 @@ const handleAdminLogin = async (req, res) => {
     }
 }
 
+
+const handleAdminGet = async (req, res) => {
+
+    try {
+        const id = req.params.id;
+        const admin = await AdminModel.findById({ _id: id })
+        if (!admin) {
+            return res.status(400).json({
+                msg: "Admin Not Found"
+            })
+        }
+        return res.json(admin);
+    }
+    catch (error) {
+        const errMsg = error.message;
+        console.log({ errMsg });
+        return res.status(500).json({
+            msg: "Internal Server Error",
+            errMsg
+        })
+    }
+}
+
+const handleUpdateAdmin = async (req, res) => {
+
+    try {
+        const id = req.params.id;
+        const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
+
+        const admin = await AdminModel.findById({ _id: id });
+        if (!admin) {
+            return res.status(400).json({ msg: "Admin Not Found" });
+        }
+
+        const UpdatedOptions = {
+            Name,
+            MobileNumber,
+            Gender,
+            Password
+        }
+        const udpatedAdmin = await AdminModel.findByIdAndUpdate(id, UpdatedOptions, { new: true })
+
+        console.log({ udpatedAdmin });
+        return res.status(200).json({
+            msg: "Admin Updated",
+            success: true,
+        });
+    } catch (error) {
+        const errMsg = error.message;
+        console.log({ errMsg });
+        return res.status(500).json({
+            msg: "Internal Server Error",
+            errMsg
+        })
+    }
+}
+
 module.exports = {
     handleAdminCreation,
-    handleAdminLogin
+    handleAdminLogin,
+    handleAdminGet,
+    handleUpdateAdmin
 }
 
