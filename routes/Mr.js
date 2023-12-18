@@ -12,7 +12,7 @@ const { createMr, loginMr, GetDoctorsByMR, handleSheetUpload, handleAdminSideRep
 router.post("/create-mr", createMr);
 router.post("/login-mr", loginMr);
 router.get("/get-mr-doctors/:id", GetDoctorsByMR);
-router.post("/upload-sheet", upload.single('file'), handleSheetUpload);
+router.post("/upload-sheet/:id", upload.single('file'), handleSheetUpload);
 
 
 

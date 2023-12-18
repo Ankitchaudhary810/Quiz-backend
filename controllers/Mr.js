@@ -5,9 +5,18 @@ const csv = require('csv-parser');
 const xlsx = require('xlsx');
 const sendMail = require("../utility/sendMail");
 const { maskEmail } = require("../utility/maskEmail");
+const AdminModel = require("../models/admin")
 
 const handleSheetUpload = async (req, res) => {
+
     try {
+        const AdminId = req.params.id;
+        const admin = await AdminModel.findById({ _id: AdminId });
+        if (!admin) {
+            return res.status(400).json({
+                msg: "Admin Not Found"
+            })
+        }
         const workbook = xlsx.readFile(req.file.path);
         const sheetName = workbook.SheetNames[0];
         const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
@@ -39,6 +48,8 @@ const handleSheetUpload = async (req, res) => {
                     SCCODE: row.SCCODE,
                 })
                 await newMr.save();
+                await admin.Mrs.push(newMr._id);
+                await admin.save();
                 const newDoctor = await new Quiz({
                     doctorName: row.doctorName,
                     scCode: row.scCode,
