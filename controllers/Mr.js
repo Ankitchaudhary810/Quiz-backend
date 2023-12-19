@@ -432,7 +432,7 @@ const handleForgetPassword = async (req, res) => {
         return res.status(200).json({
             success: true,
             mrMail: mrMail,
-            msg: `We Will Send Password To This mail ${mrMail}, Kindly Check Junk And SPAM Folder`
+            msg: `Password is send on mail ${mrMail}, Check Junk And SPAM Folder`
         })
 
     } catch (error) {
