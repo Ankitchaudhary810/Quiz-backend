@@ -35,17 +35,42 @@ exports.postDrData = async (req, res) => {
 
 exports.getDoctorName = async (req, res) => {
   try {
-    const doctorNames = await Quiz.find({});
-    let doctorNameArray = [];
-    doctorNameArray = doctorNames.map((doc) => doc);
+    const doctorNames = await Quiz.find({}).populate({
+      path: 'mrReference',
+      select: 'MRID REGION',
+    });
+
+    let doctorNameArray = doctorNames.map((doc) => {
+      const doctorData = {
+        doctorName: doc.doctorName,
+        scCode: doc.scCode,
+        city: doc.city,
+        state: doc.state,
+        locality: doc.locality,
+        quizCategories: doc.quizCategories,
+      };
+
+      if (doc.mrReference) {
+        doctorData.mrId = doc.mrReference.MRID;
+        doctorData.region = doc.mrReference.REGION;
+      } else {
+        doctorData.mrId = null;
+        doctorData.region = null;
+      }
+
+      return doctorData;
+    });
+
     console.log({ doctorNameArray });
 
     return res.json(doctorNameArray);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    const errorMessage = error.message;
+    return res.status(500).json({ message: "Internal Server Error", errorMessage });
   }
 };
+
 
 exports.handleUserDataById = async (req, res) => {
   const userId = req.params.userId;

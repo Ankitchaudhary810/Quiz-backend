@@ -32,6 +32,7 @@ const handleSheetUpload = async (req, res) => {
                     locality: row.locality,
                     mrReference: existingMr._id
                 })
+                console.log({ newDoctor })
                 await existingMr.save();
                 await newDoctor.save();
             } else {
@@ -48,7 +49,7 @@ const handleSheetUpload = async (req, res) => {
                     SCCODE: row.SCCODE,
                 })
                 await newMr.save();
-                await admin.Mrs.push(newMr._id);
+                admin.Mrs.push(newMr._id);
                 await admin.save();
                 const newDoctor = await new Quiz({
                     doctorName: row.doctorName,
@@ -426,9 +427,6 @@ const handleForgetPassword = async (req, res) => {
         console.log({ messageToBeSend });
 
         const mrMail = maskEmail(mr.EMAIL);
-
-
-
         return res.status(200).json({
             success: true,
             mrMail: mrMail,
