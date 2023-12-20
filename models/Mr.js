@@ -2,6 +2,7 @@ const mongosoe = require("mongoose");
 
 const mrSchema = new mongosoe.Schema({
 
+    _id: mongosoe.Schema.Types.ObjectId,
     USERNAME: {
         type: String,
         // required: true,

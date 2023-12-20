@@ -520,7 +520,49 @@ const handleTopMrByDoctor = async (req, res) => {
     }
 };
 
+const handleTop20Mr = async (req, res) => {
+    try {
+        const top20MRS = await mrModel.aggregate([
+            {
+                $lookup: {
+                    from: "quizzes",
+                    localField: "_id",
+                    foreignField: "mrReference",
+                    as: "doctors",
+                },
+            },
+            {
+                $addFields: {
+                    totalDoctors: { $size: "$doctors" },
+                },
+            },
+            {
+                $sort: { totalDoctors: -1 },
+            },
+            {
+                $limit: 20,
+            },
+            {
+                $project: {
+                    USERNAME: 1,
+                    MRID: 1,
+                    REGION: 1,
+                    HQ: 1,
+                    totalDoctors: 1,
+                },
+            },
+        ]);
 
+        res.send(top20MRS);
+    } catch (error) {
+        console.log('Error in handleTop20Mr', error);
+        let err = error.message;
+        return res.status(500).json({
+            msg: 'Internal Server Error',
+            err,
+        });
+    }
+};
 
 
 
@@ -534,5 +576,6 @@ module.exports = {
     handleAllMrDoctorsDataV2,
     handleForgetPassword,
     handleTopMrByDoctor,
-    handleTopCategoryChart
+    handleTopCategoryChart,
+    handleTop20Mr
 }
