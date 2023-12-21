@@ -567,7 +567,7 @@ module.exports = {
     createMr,
     loginMr,
     GetDoctorsByMR,
-    handleSheetUpload,
+    // handleSheetUpload,
     handleAdminSideReports,
     handleAllMrDoctorsData,
     handleAllMrDoctorsDataV2,

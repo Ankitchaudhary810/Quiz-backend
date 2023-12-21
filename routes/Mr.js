@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const upload = multer({ dest: 'uploads/' });
 
-const { createMr, loginMr, GetDoctorsByMR, handleSheetUpload, handleAdminSideReports, handleAllMrDoctorsData, handleAllMrDoctorsDataV2, handleForgetPassword, handleTopMrByDoctor, handleTopCategoryChart, handleTop20Mr } = require("../controllers/Mr")
+const { createMr, loginMr, GetDoctorsByMR, handleAdminSideReports, handleAllMrDoctorsData, handleAllMrDoctorsDataV2, handleForgetPassword, handleTopMrByDoctor, handleTopCategoryChart, handleTop20Mr } = require("../controllers/Mr")
 
 
 router.post("/create-mr", createMr);
