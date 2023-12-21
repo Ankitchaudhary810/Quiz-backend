@@ -561,7 +561,75 @@ const handleTop20Mr = async (req, res) => {
     }
 };
 
+const handleUpload = async (req, res) => {
+    try {
+        const AdminId = req.params.id;
+        const admin = await AdminModel.findById({ _id: AdminId });
+        if (!admin) {
+            return res.status(400).json({
+                msg: "Admin Not Found"
+            })
+        }
 
+        const workbook = xlsx.readFile(req.file.path);
+        const sheetName = workbook.SheetNames[0];
+        const sheetData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
+        for (const row of sheetData) {
+            console.log({ row });
+            const existingMr = await mrModel.findOne({ MRID: row.MRID });
+            if (existingMr) {
+                const newDoctor = await new Quiz({
+                    doctorName: row.doctorName,
+                    scCode: row.scCode,
+                    city: row.city,
+                    state: row.state,
+                    locality: row.locality,
+                    doc: Date.now(),
+                    mrReference: existingMr._id
+                })
+                console.log({ newDoctor });
+                await existingMr.save();
+                await newDoctor.save();
+            }
+            else {
+                const newMr = await new mrModel({
+                    USERNAME: row.USERNAME,
+                    MRID: row.MRID,
+                    PASSWORD: row.PASSWORD,
+                    EMAIL: row.EMAIL,
+                    ROLE: row.ROLE,
+                    HQ: row.HQ,
+                    REGION: row.REGION,
+                    BUSINESSUNIT: row.BUSINESSUNIT,
+                    DOJ: row.DOJ,
+                    SCCODE: row.SCCODE,
+                })
+                await newMr.save();
+
+                admin.Mrs.push(newMr._id);
+                await admin.save();
+                const newDoctor = await new Quiz({
+                    doctorName: row.doctorName,
+                    scCode: row.scCode,
+                    city: row.city,
+                    state: row.state,
+                    locality: row.locality,
+                    doc: Date.now(),
+                    mrReference: newMr._id
+                })
+                await newDoctor.save();
+            }
+        }
+        res.status(200).json({ message: "Data uploaded successfully" })
+    } catch (error) {
+        console.error(error);
+        const err = error.message;
+        res.status(500).json({
+            error: 'Internal server error',
+            err
+        })
+    }
+}
 
 module.exports = {
     createMr,
@@ -574,5 +642,6 @@ module.exports = {
     handleForgetPassword,
     handleTopMrByDoctor,
     handleTopCategoryChart,
-    handleTop20Mr
+    handleTop20Mr,
+    handleUpload
 }
