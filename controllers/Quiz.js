@@ -1,21 +1,24 @@
 const Quiz = require("../models/Quiz");
 const mrModel = require("../models/Mr");
 const axios = require("axios");
+
 exports.postDrData = async (req, res) => {
-  const { doctorName, city, state, mrId, scCode, locality } = req.body;
+  const { doctorName, city, state, mrId, scCode, locality, date } = req.body;
 
   let mr = await mrModel.findById({ _id: mrId });
   if (!mr) return res.status(400).json({ msg: "MR Not Found" });
   let doctor = await Quiz.findOne({ scCode });
   if (doctor) return res.status(400).json({ msg: "Same scCode is find in the database" });
-  console.log({ mr });
+
+
   const newDoctor = new Quiz({
     doctorName: doctorName,
     city: city,
     state: state,
     scCode: scCode,
     locality: locality,
-    mrReference: mr._id
+    doc: date ? new Date(date) : Date.now(),
+    mrReference: mr._id,
   });
 
   try {
@@ -31,13 +34,11 @@ exports.postDrData = async (req, res) => {
   }
 };
 
-
-
 exports.getDoctorName = async (req, res) => {
   try {
     const doctorNames = await Quiz.find({}).populate({
-      path: 'mrReference',
-      select: 'MRID REGION',
+      path: "mrReference",
+      select: "MRID REGION",
     });
 
     let doctorNameArray = doctorNames.map((doc) => {
@@ -67,10 +68,11 @@ exports.getDoctorName = async (req, res) => {
   } catch (error) {
     console.error(error);
     const errorMessage = error.message;
-    return res.status(500).json({ message: "Internal Server Error", errorMessage });
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage });
   }
 };
-
 
 exports.handleUserDataById = async (req, res) => {
   const userId = req.params.userId;
@@ -86,11 +88,11 @@ exports.handleUserDataById = async (req, res) => {
   }
 };
 
-
 exports.handleUserQuizSubmit = async (req, res) => {
   const userId = req.body.userId;
   const totalPoints = req.body.totalPoints;
   const categoryName = req.body.categoryName;
+  const date = req.body.date;
 
   try {
     const user = await Quiz.findById(userId);
@@ -106,7 +108,10 @@ exports.handleUserQuizSubmit = async (req, res) => {
       user.quizCategories = [];
     }
 
-    console.log("After initializing - user.quizCategories:", user.quizCategories);
+    console.log(
+      "After initializing - user.quizCategories:",
+      user.quizCategories
+    );
 
     // Check if the category exists
     const existingCategory = user.quizCategories.find(
@@ -120,6 +125,7 @@ exports.handleUserQuizSubmit = async (req, res) => {
         categoryName,
         isPlayed: false,
         TotalPoints: 0,
+        doc: date ? new Date(date) : Date.now(),
       });
     } else if (existingCategory.isPlayed) {
       return res.status(200).json({ msg: "Category already played" });
@@ -162,9 +168,6 @@ exports.handleUserQuizSubmit = async (req, res) => {
     return res.status(400).json({ msg: "Internal Server Error", error });
   }
 };
-
-
-
 
 exports.handleLeaderBoardFilter = async (req, res) => {
   const state = req.body.state;
@@ -215,24 +218,24 @@ exports.handleLeaderBoardFilter = async (req, res) => {
 
 exports.handleLeaderFilterByCategoryName = async (req, res) => {
   const categoryName = req.params.categoryName;
-  const { mrId } = req.params
+  const { mrId } = req.params;
   console.log({ categoryName });
   try {
     if (!categoryName) {
       return res.status(400).json({
-        msg: 'CategoryName is required',
+        msg: "CategoryName is required",
       });
     }
 
     if (!mrId) {
       return res.status(400).json({
         msg: "mrId is required",
-      })
+      });
     }
     const users = await Quiz.find({
-      'quizCategories.categoryName': categoryName,
-      'quizCategories.isPlayed': true,
-      'mrReference': mrId,
+      "quizCategories.categoryName": categoryName,
+      "quizCategories.isPlayed": true,
+      mrReference: mrId,
     });
 
     const categoryLeaderboard = users.map((user) => ({
@@ -242,17 +245,16 @@ exports.handleLeaderFilterByCategoryName = async (req, res) => {
     }));
 
     return res.status(200).json({
-      msg: 'Category leaderboard retrieved successfully',
+      msg: "Category leaderboard retrieved successfully",
       categoryLeaderboard,
     });
   } catch (error) {
-    console.error('error:', error);
+    console.error("error:", error);
     return res.status(500).json({
-      msg: 'Internal Server Error',
+      msg: "Internal Server Error",
     });
   }
 };
-
 
 exports.handleUsersStateAndName = async (req, res) => {
   try {
@@ -270,13 +272,15 @@ exports.handleUsersStateAndName = async (req, res) => {
 exports.handleOnlyNameWithId = async (req, res) => {
   try {
     const { mrId } = req.body;
-    const doctors = await Quiz.find({ mrReference: mrId }).select('_id doctorName scCode locality');
+    const doctors = await Quiz.find({ mrReference: mrId }).select(
+      "_id doctorName scCode locality"
+    );
     if (!doctors || doctors.length === 0) {
       return res.status(404).json({
-        msg: 'No Doctors Found for the specified MR',
+        msg: "No Doctors Found for the specified MR",
       });
     }
-    console.log({ doctors })
+    console.log({ doctors });
 
     return res.status(200).json(doctors);
   } catch (e) {
@@ -286,8 +290,6 @@ exports.handleOnlyNameWithId = async (req, res) => {
     });
   }
 };
-
-
 
 exports.handleUserCategory = async (req, res) => {
   const { userId } = req.params;
@@ -319,8 +321,6 @@ exports.handleUserCategory = async (req, res) => {
       });
     }
 
-
-
     return res.status(200).json(formattedCategories);
   } catch (error) {
     console.error(error); // Log the error for debugging
@@ -329,8 +329,6 @@ exports.handleUserCategory = async (req, res) => {
     });
   }
 };
-
-
 
 exports.handleUserCategoryWithQuestion = async (req, res) => {
   const { userId } = req.params;
@@ -360,7 +358,9 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
 
     let OnlyActiveCategories = [];
     try {
-      const response = await axios.get('https://backup-quiz-server.onrender.com/onlyactivecategories');
+      const response = await axios.get(
+        "https://backup-quiz-server.onrender.com/onlyactivecategories"
+      );
       OnlyActiveCategories = response.data;
     } catch (error) {
       console.error(error);
@@ -368,33 +368,46 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
 
     const onlyFourActiveQuestions = [];
 
-    await Promise.all(OnlyActiveCategories.map(async (Category) => {
-      let category = Category.name;
-      console.log({ category });
+    await Promise.all(
+      OnlyActiveCategories.map(async (Category) => {
+        let category = Category.name;
+        console.log({ category });
 
-      try {
-        const response = await axios.get(`https://backup-quiz-server.onrender.com/api/questionsfour?category=${category}`);
-        onlyFourActiveQuestions.push(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    }));
+        try {
+          const response = await axios.get(
+            `https://backup-quiz-server.onrender.com/api/questionsfour?category=${category}`
+          );
+          onlyFourActiveQuestions.push(response.data);
+        } catch (error) {
+          console.error(error);
+        }
+      })
+    );
 
     let MultipleQuestions = [];
     try {
-      const response = await axios.get('https://backup-quiz-server.onrender.com/api/questions');
+      const response = await axios.get(
+        "https://backup-quiz-server.onrender.com/api/questions"
+      );
       MultipleQuestions = response.data;
     } catch (error) {
       console.error(error);
     }
 
-    return res.status(200).json({ formattedCategories, OnlyActiveCategories, onlyFourActiveQuestions, MultipleQuestions });
+    return res
+      .status(200)
+      .json({
+        formattedCategories,
+        OnlyActiveCategories,
+        onlyFourActiveQuestions,
+        MultipleQuestions,
+      });
   } catch (error) {
     const err = error.message;
     console.error(error);
     return res.status(500).json({
       msg: "Internal Server Error",
-      err
+      err,
     });
   }
 };

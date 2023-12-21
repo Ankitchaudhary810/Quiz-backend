@@ -1,11 +1,10 @@
-
-
 const mongoose = require("mongoose");
 
 const quizCategorySchema = new mongoose.Schema({
   categoryName: String,
   isPlayed: Boolean,
   TotalPoints: Number,
+  doc: Date
 });
 
 const doctorSchema = mongoose.Schema({
@@ -17,6 +16,7 @@ const doctorSchema = mongoose.Schema({
   city: String,
   state: String,
   locality: String,
+  doc: Date,
   mrReference: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Mr",
