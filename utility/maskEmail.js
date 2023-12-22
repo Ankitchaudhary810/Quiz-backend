@@ -6,4 +6,4 @@ const maskEmail = (email) => {
 
 module.exports = {
     maskEmail
-}
+} 

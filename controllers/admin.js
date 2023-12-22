@@ -1,7 +1,6 @@
 
 const AdminModel = require("../models/admin");
-
-
+const MrModel = require("../models/Mr")
 const handleAdminCreation = async (req, res) => {
     try {
         const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
@@ -130,10 +129,38 @@ const handleUpdateAdmin = async (req, res) => {
     }
 }
 
+const handleMrData = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const admin = await AdminModel.findById(id).populate('Mrs', 'MRID _id');
+
+        if (!admin) {
+            return res.status(400).json({ msg: "Admin not found" });
+        }
+
+        const mrData = admin.Mrs.map(mr => {
+            return {
+                MRID: mr.MRID,
+                _id: mr._id
+            };
+        });
+
+        return res.status(200).json(mrData);
+    } catch (error) {
+        const errMsg = error.message;
+        console.log({ errMsg });
+        return res.status(500).json({
+            msg: "Internal Server Error",
+            errMsg
+        });
+    }
+};
+
 module.exports = {
     handleAdminCreation,
     handleAdminLogin,
     handleAdminGet,
-    handleUpdateAdmin
+    handleUpdateAdmin,
+    handleMrData
 }
 

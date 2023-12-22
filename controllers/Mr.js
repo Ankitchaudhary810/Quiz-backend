@@ -71,10 +71,19 @@ const AdminModel = require("../models/admin")
 
 const createMr = async (req, res) => {
     try {
+        const AdminId = req.params.id;
+        const admin = await AdminModel.findById({ _id: AdminId });
+        if (!admin) {
+            return res.status(400).json({
+                msg: "Admin Not Found"
+            })
+        }
         const { USERNAME, MRID, PASSWORD, EMAIL, ROLE, HQ, REGION, BUSINESSUNIT, DOJ, SCCODE } = req.body;
         let mr;
         mr = await mrModel.findOne({ MRID: MRID });
-        if (mr) return res.status(400).json({ msg: "MRID is already Exists!" });
+        const mr_id = mr.EMAIL
+        console.log(mr_id);
+        if (mr) return res.status(400).json({ msg: "MRID is already Exists", mr_id });
         mr = new mrModel({
             USERNAME,
             MRID,
@@ -92,6 +101,8 @@ const createMr = async (req, res) => {
             cnt: 1
         });
         await mr.save();
+        admin.Mrs.push(mr._id);
+        await admin.save();
         return res.status(200).json(mr)
     } catch (error) {
         console.log("Error in CreateMr");

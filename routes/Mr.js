@@ -9,7 +9,7 @@ const upload = multer({ dest: 'uploads/' });
 const { createMr, loginMr, GetDoctorsByMR, handleAdminSideReports, handleAllMrDoctorsData, handleAllMrDoctorsDataV2, handleForgetPassword, handleTopMrByDoctor, handleTopCategoryChart, handleTop20Mr, handleUpload } = require("../controllers/Mr")
 
 
-router.post("/create-mr", createMr);
+router.post("/create-mr/:id", createMr);
 router.post("/login-mr", loginMr);
 router.get("/get-mr-doctors/:id", GetDoctorsByMR);
 // router.post("/upload-sheet/:id", upload.single('file'), handleSheetUpload);
