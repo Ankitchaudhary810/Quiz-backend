@@ -43,6 +43,7 @@ exports.getDoctorName = async (req, res) => {
 
     let doctorNameArray = doctorNames.map((doc) => {
       const doctorData = {
+        Id: doc._id,
         doctorName: doc.doctorName,
         scCode: doc.scCode,
         city: doc.city,
