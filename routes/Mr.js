@@ -20,6 +20,7 @@ router.post("/upload-sheet/:id", upload.single('file'), handleUpload)
 router.get("/admin-side-reports", handleAdminSideReports);
 
 router.get("/get-all-doctor-mrs-data", handleAllMrDoctorsData);
+
 router.get("/v2/get-all-doctor-mrs-data", handleAllMrDoctorsDataV2);
 router.post("/forget-mr-password", handleForgetPassword);
 router.get("/top-mr-by-doctor", handleTopMrByDoctor);

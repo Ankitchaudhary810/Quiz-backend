@@ -334,6 +334,7 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                             city: '$doctors.city',
                             locality: '$doctors.locality',
                             state: '$doctors.state',
+                            doc: '$doctors.doc',
                             quizCategories: {
                                 $ifNull: ['$doctors.quizCategories', []],
                             },
@@ -389,6 +390,7 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                     doctor.city || '',
                     doctor.locality || '',
                     doctor.state || '',
+                    doctor.doc || 'Date Not Available',
                     ...categoryData,
                     totalCategoryPlayed,
                 ];

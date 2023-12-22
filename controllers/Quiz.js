@@ -411,3 +411,39 @@ exports.handleUserCategoryWithQuestion = async (req, res) => {
     });
   }
 };
+
+
+exports.handleDoctorStatus = async (req, res) => {
+  try {
+    // Get the current date
+    const currentDate = new Date();
+
+    // Calculate the start and end dates for the current month
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+
+    // Find doctors based on the current month
+    const currentMonthDoctors = await Quiz.find({
+      doc: { $gte: startOfMonth, $lte: endOfMonth },
+    }).select("-quizCategories")
+
+    // Find doctors not in the current month
+    const otherMonthDoctors = await Quiz.find({
+      doc: { $lt: startOfMonth },
+    }).select("-quizCategories")
+
+    return res.status(200).json(
+      {
+        currentMonthDoctors,
+        otherMonthDoctors,
+      }
+    );
+  } catch (error) {
+    const err = error.message;
+    console.error(error);
+    return res.status(500).json({
+      msg: "Internal Server Error",
+      err,
+    });
+  }
+};

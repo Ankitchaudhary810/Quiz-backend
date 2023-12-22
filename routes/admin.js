@@ -5,7 +5,7 @@ const { handleAdminCreation, handleAdminLogin, handleAdminGet, handleUpdateAdmin
 
 
 router.route("/create-admin").post(handleAdminCreation);
-router.route("/admin-login",).post(handleAdminLogin);
+router.route("/admin-login").post(handleAdminLogin);
 
 router.route("/get-admin/:id").get(handleAdminGet);
 router.route("/update-admin/:id").patch(handleUpdateAdmin);

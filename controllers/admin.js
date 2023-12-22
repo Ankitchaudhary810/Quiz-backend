@@ -3,11 +3,8 @@ const AdminModel = require("../models/admin");
 
 
 const handleAdminCreation = async (req, res) => {
-
     try {
-
         const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
-
         const admin = await AdminModel.findOne({ AdminId: AdminId });
 
         if (admin) {
@@ -111,7 +108,6 @@ const handleUpdateAdmin = async (req, res) => {
         if (!admin) {
             return res.status(400).json({ msg: "Admin Not Found" });
         }
-
         const UpdatedOptions = {
             Name,
             MobileNumber,
@@ -119,7 +115,6 @@ const handleUpdateAdmin = async (req, res) => {
             Password
         }
         const udpatedAdmin = await AdminModel.findByIdAndUpdate(id, UpdatedOptions, { new: true })
-
         console.log({ udpatedAdmin });
         return res.status(200).json({
             msg: "Admin Updated",
