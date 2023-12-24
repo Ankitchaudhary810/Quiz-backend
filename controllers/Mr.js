@@ -644,6 +644,20 @@ const handleUpload = async (req, res) => {
     }
 }
 
+const handleMrsRegion = async (req, res) => {
+    try {
+        const regions = await mrModel.find({}).select("REGION , -_id").lean();
+        return res.json(regions);
+    } catch (error) {
+        console.error(error);
+        const err = error.message;
+        res.status(500).json({
+            error: 'Internal server error',
+            err
+        })
+    }
+}
+
 module.exports = {
     createMr,
     loginMr,
@@ -656,5 +670,6 @@ module.exports = {
     handleTopMrByDoctor,
     handleTopCategoryChart,
     handleTop20Mr,
-    handleUpload
+    handleUpload,
+    handleMrsRegion
 }
