@@ -16,6 +16,7 @@ const doctorSchema = mongoose.Schema({
   city: String,
   state: String,
   locality: String,
+  speciality: String,
   doc: Date,
   mrReference: {
     type: mongoose.Schema.Types.ObjectId,

@@ -1,7 +1,9 @@
 const express = require("express")
 const router = express.Router();
 
-const { postDrData, getDoctorName, handleUserDataById, handleUserQuizSubmit, handleLeaderBoardFilter, handleLeaderFilterByCategoryName, handleUsersStateAndName, handleOnlyNameWithId, handleUserCategory, handleUserCategoryWithQuestion, handleDoctorStatus } = require("../controllers/Quiz")
+const { postDrData, getDoctorName, handleUserDataById, handleUserQuizSubmit, handleLeaderBoardFilter, handleLeaderFilterByCategoryName, handleUsersStateAndName, handleOnlyNameWithId, handleUserCategory, handleUserCategoryWithQuestion, handleDoctorStatus, handleAddDoctorV2 } = require("../controllers/Quiz");
+
+
 
 
 
@@ -19,6 +21,9 @@ router.get("/get/user-category-with-mulquestions-fourquestions/:userId", handleU
 
 // get all current month doctor and old doctor list
 
-router.route("/old-new-doctor-list").get(handleDoctorStatus)
+router.route("/old-new-doctor-list").get(handleDoctorStatus);
+
+// Version 2 for API OF ADD FOR spacility
+router.route("/v2/user").post(handleAddDoctorV2);
 
 module.exports = router

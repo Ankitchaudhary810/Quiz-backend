@@ -646,7 +646,7 @@ const handleUpload = async (req, res) => {
 
 const handleMrsRegion = async (req, res) => {
     try {
-        const regions = await mrModel.find({}).select("REGION , -_id").lean();
+        const regions = await mrModel.find({}).select("REGION , _id").lean();
         const uniqueRegionsSet = new Set();
         const uniqueRegions = regions.filter(region => {
             if (!uniqueRegionsSet.has(region.REGION)) {

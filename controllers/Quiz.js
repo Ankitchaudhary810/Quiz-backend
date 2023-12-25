@@ -448,3 +448,38 @@ exports.handleDoctorStatus = async (req, res) => {
     });
   }
 };
+
+
+exports.handleAddDoctorV2 = async (req, res) => {
+  const { doctorName, city, state, mrId, scCode, locality, date, speciality } = req.body;
+
+  let mr = await mrModel.findById({ _id: mrId });
+  if (!mr) return res.status(400).json({ msg: "MR Not Found" });
+  let doctor = await Quiz.findOne({ scCode });
+  if (doctor) return res.status(400).json({ msg: "Same scCode is find in the database" });
+
+
+  const newDoctor = new Quiz({
+    city: city,
+    state: state,
+    scCode: scCode,
+    locality: locality,
+    speciality: speciality,
+    doctorName: doctorName,
+    doc: date ? new Date(date) : Date.now(),
+    mrReference: mr._id,
+  });
+
+  try {
+    const data = await newDoctor.save();
+    const Id = data._id;
+    return res.status(201).json({
+      message: "Doctor data inserted v2",
+      Id,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+
+}
