@@ -150,6 +150,8 @@ exports.handleUserQuizSubmit = async (req, res) => {
       .select("doctorName quizCategories")
       .exec();
 
+
+
     // Extract doctor names and scores from the result
     let categoryLeaderboard = users.map((user) => ({
       doctorName: user.doctorName,
@@ -158,6 +160,129 @@ exports.handleUserQuizSubmit = async (req, res) => {
       ).TotalPoints,
     }));
     console.log(categoryLeaderboard);
+
+    return res.status(200).json({
+      msg: "QuizCategory updated successfully",
+      categoryName,
+      categoryLeaderboard,
+    });
+  } catch (error) {
+    console.log("error: ", error);
+    return res.status(400).json({ msg: "Internal Server Error", error });
+  }
+};
+
+exports.handleUserQuizSubmitV2 = async (req, res) => {
+  const userId = req.body.userId;
+  const totalPoints = req.body.totalPoints;
+  const categoryName = req.body.categoryName;
+  const date = req.body.date;
+
+  try {
+    const user = await Quiz.findById(userId);
+
+    if (!user) {
+      return res.status(401).json({ msg: "User not found" });
+    }
+
+    console.log("Before update - user.quizCategories:", user.quizCategories);
+
+    // Create quizCategories array if it doesn't exist
+    if (!user.quizCategories) {
+      user.quizCategories = [];
+    }
+
+
+
+    // Check if the category exists
+    const existingCategory = user.quizCategories.find(
+      (category) => category.categoryName === categoryName
+    );
+
+    console.log({});
+
+    if (!existingCategory) {
+      console.log(`Adding new category: ${categoryName}`);
+      // If the category doesn't exist, add it to the array
+      user.quizCategories.push({
+        categoryName,
+        isPlayed: false,
+        TotalPoints: 0,
+        doc: date ? new Date(date) : Date.now(),
+      });
+    } else if (existingCategory.isPlayed) {
+
+
+      // update the data here 
+
+      // Update the category as played and set the total points
+      const updatedCategory = user.quizCategories.find(
+        (category) => category.categoryName === categoryName
+      );
+      updatedCategory.isPlayed = true;
+      updatedCategory.TotalPoints = totalPoints;
+
+      await user.save();
+
+      const users = await Quiz.find({
+        "quizCategories.categoryName": categoryName,
+        "quizCategories.isPlayed": true,
+      })
+        .select("doctorName quizCategories")
+        .exec();
+
+
+
+      // Extract doctor names and scores from the result
+      let categoryLeaderboard = users.map((user) => ({
+        doctorName: user.doctorName,
+        score: user.quizCategories.find(
+          (category) => category.categoryName === categoryName
+        ).TotalPoints,
+      }));
+
+      return res.status(200).json({
+
+        // version 2 
+        msg: "QuizCategory updated successfully ",
+        categoryName,
+        categoryLeaderboard,
+      });
+
+
+
+
+
+      // return res.status(200).json({ msg: "Category already played" });
+    }
+
+
+
+    // Update the category as played and set the total points
+    const updatedCategory = user.quizCategories.find(
+      (category) => category.categoryName === categoryName
+    );
+    updatedCategory.isPlayed = true;
+    updatedCategory.TotalPoints = totalPoints;
+
+    await user.save();
+
+    const users = await Quiz.find({
+      "quizCategories.categoryName": categoryName,
+      "quizCategories.isPlayed": true,
+    })
+      .select("doctorName quizCategories")
+      .exec();
+
+
+
+    // Extract doctor names and scores from the result
+    let categoryLeaderboard = users.map((user) => ({
+      doctorName: user.doctorName,
+      score: user.quizCategories.find(
+        (category) => category.categoryName === categoryName
+      ).TotalPoints,
+    }));
 
     return res.status(200).json({
       msg: "QuizCategory updated successfully",
