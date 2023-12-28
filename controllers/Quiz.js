@@ -38,8 +38,11 @@ exports.getDoctorName = async (req, res) => {
   try {
     const doctorNames = await Quiz.find({}).populate({
       path: "mrReference",
-      select: "MRID REGION",
+      select: "MRID REGION HQ USERNAME",
     });
+
+
+
 
     let doctorNameArray = doctorNames.map((doc) => {
       const doctorData = {
@@ -53,11 +56,16 @@ exports.getDoctorName = async (req, res) => {
       };
 
       if (doc.mrReference) {
+        doctorData.hq = doc.mrReference.HQ;
         doctorData.mrId = doc.mrReference.MRID;
         doctorData.region = doc.mrReference.REGION;
+        doctorData.username = doc.mrReference.USERNAME;
+
       } else {
+        doctorData.hq = null;
         doctorData.mrId = null;
         doctorData.region = null;
+        doctorData.username = null;
       }
 
       return doctorData;
