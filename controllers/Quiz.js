@@ -229,6 +229,7 @@ exports.handleUserQuizSubmitV2 = async (req, res) => {
       );
       updatedCategory.isPlayed = true;
       updatedCategory.TotalPoints = totalPoints;
+      updatedCategory.doc = date ? new Date(date) : Date.now();
 
       await user.save();
 

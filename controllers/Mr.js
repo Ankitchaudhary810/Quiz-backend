@@ -311,6 +311,14 @@ const handleAllMrDoctorsData = async (req, res) => {
     }
 };
 
+
+function formatDate(date) {
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 const handleAllMrDoctorsDataV2 = async (req, res) => {
     try {
         const mrsAndDoctors = await mrModel.aggregate([
@@ -391,7 +399,12 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                 }
 
                 const categoryData = doctor.quizCategories.map((category) => {
-                    return [{ "categoryName": category.categoryName, "Points": category.TotalPoints || 0 }];
+                    return [{
+                        "categoryName": category.categoryName,
+                        "Points": category.TotalPoints || 0,
+                        "DateOfPlayed": formatDate(new Date(category.doc))
+                    }];
+
                 });
 
                 return [
