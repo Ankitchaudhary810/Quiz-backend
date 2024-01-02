@@ -134,7 +134,7 @@ const handleUpdateAdmin = async (req, res) => {
 const handleMrData = async (req, res) => {
     try {
         const id = req.params.id;
-        const admin = await AdminModel.findById(id).populate('Mrs', 'MRID _id');
+        const admin = await AdminModel.findById(id).populate('Mrs', 'MRID _id USERNAME');
 
         if (!admin) {
             return res.status(400).json({ msg: "Admin not found" });
@@ -143,9 +143,12 @@ const handleMrData = async (req, res) => {
         const mrData = admin.Mrs.map(mr => {
             return {
                 MRID: mr.MRID,
-                _id: mr._id
+                mrName: mr.USERNAME,
+                _id: mr._id,
             };
         });
+
+        console.log(mrData);
 
         return res.status(200).json(mrData);
     } catch (error) {
