@@ -1,6 +1,8 @@
 
 const AdminModel = require("../models/admin");
-const MrModel = require("../models/Mr")
+const MrModel = require("../models/Mr");
+const doctorModel = require("../models/Quiz");
+const mongoose = require("mongoose")
 const handleAdminCreation = async (req, res) => {
     try {
         const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
@@ -156,11 +158,134 @@ const handleMrData = async (req, res) => {
     }
 };
 
+const handleDoctorDataUnderAdmin = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(adminId)) {
+            return res.status(400).json({ error: 'Invalid admin ID format' });
+        }
+
+        const adminData = await AdminModel.findById(adminId).populate({
+            path: 'Mrs',
+            model: 'Mr',
+            options: { strictPopulate: false }
+        });
+
+        if (!adminData || !adminData.Mrs || adminData.Mrs.length === 0) {
+            return res.status(404).json({ error: 'Admin not found or has no related MR data' });
+        }
+
+        const mrIdsArray = adminData.Mrs.map(mr => mr._id);
+
+        const doctorsArray = await doctorModel.find({ mrReference: { $in: mrIdsArray } })
+            .populate('mrReference', 'MRID HQ REGION BUSINESSUNIT DOJ USERNAME _id EMAIL')
+            .populate({ path: 'quizCategories', model: 'QuizCategory' }) // Use the model name for quizCategories
+            .exec();
+
+        // Map the result to include quizCategories
+        const formattedDoctorsArray = doctorsArray.map(doctor => ({
+            _id: doctor._id,
+            doctorName: doctor.doctorName,
+            scCode: doctor.scCode,
+            city: doctor.city,
+            state: doctor.state,
+            locality: doctor.locality,
+            speciality: doctor.speciality,
+            quizCategories: doctor.quizCategories,
+            mrReference: {
+                mrid: doctor.mrReference._id,
+                mrName: doctor.mrReference.USERNAME,
+                MRID: doctor.mrReference.MRID,
+                mrEmail: doctor.mrReference.EMAIL,
+                HQ: doctor.mrReference.HQ,
+                REGION: doctor.mrReference.REGION,
+                BUSINESSUNIT: doctor.mrReference.BUSINESSUNIT,
+                DOJ: doctor.mrReference.DOJ,
+            },
+        }));
+
+        return res.json(formattedDoctorsArray);
+    } catch (error) {
+        console.error(error);
+        const errorMessage = error.message;
+        return res.status(500).json({ message: 'Internal Server Error', errorMessage });
+    }
+};
+
+
+// const handleDoctorDataUnderAdmin = async (req, res) => {
+//     try {
+//         const adminId = req.params.id;
+
+//         if (!mongoose.Types.ObjectId.isValid(adminId)) {
+//             return res.status(400).json({ error: 'Invalid admin ID format' });
+//         }
+
+//         const adminData = await AdminModel.findById(adminId);
+
+//         if (!adminData || !adminData.Mrs || adminData.Mrs.length === 0) {
+//             return res.status(404).json({ error: 'Admin not found or has no related MR data' });
+//         }
+
+//         const mrIdsArray = adminData.Mrs.map(mr => mongoose.Types.ObjectId(mr._id));
+
+//         const doctorsArray = await doctorModel.aggregate([
+//             { $match: { mrReference: { $in: mrIdsArray } } },
+//             {
+//                 $lookup: {
+//                     from: 'mrs',
+//                     localField: 'mrReference',
+//                     foreignField: '_id',
+//                     as: 'mrData'
+//                 }
+//             },
+//             {
+//                 $unwind: '$mrData'
+//             },
+//             {
+//                 $project: {
+//                     _id: 1,
+//                     doctorName: 1,
+//                     scCode: 1,
+//                     city: 1,
+//                     state: 1,
+//                     locality: 1,
+//                     speciality: 1,
+//                     quizCategories: '$quizCategories',
+//                     mrReference: {
+//                         MRID: '$mrData.MRID',
+//                         HQ: '$mrData.HQ',
+//                         REGION: '$mrData.REGION',
+//                         BUSINESSUNIT: '$mrData.BUSINESSUNIT',
+//                         DOJ: '$mrData.DOJ',
+//                     },
+//                 }
+//             }
+//         ]);
+
+//         return res.json(doctorsArray);
+//     } catch (error) {
+//         console.error(error);
+//         const errorMessage = error.message;
+//         return res.status(500).json({ message: 'Internal Server Error', errorMessage });
+//     }
+// };
+
+
+
+
+
 module.exports = {
     handleAdminCreation,
     handleAdminLogin,
     handleAdminGet,
     handleUpdateAdmin,
-    handleMrData
+    handleMrData,
+    handleDoctorDataUnderAdmin
 }
+
+
+
+
 
