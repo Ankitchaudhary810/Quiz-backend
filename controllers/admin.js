@@ -368,6 +368,34 @@ const handleReportAdminCreate = async (req, res) => {
     }
 }
 
+
+const verifyJwtForClient = async (req, res) => {
+
+    try {
+        const token = req.params.token;
+        console.log(token);
+        if (token) {
+            const decodedToken = await jwt.verify(token, process.env.SECRET);
+            const userRole = decodedToken.id;
+            const userId = decodedToken.role;
+
+            console.log(process.env.SECRET)
+
+            console.log(userRole, userId);
+
+            console.log(decodedToken)
+
+            return res.json({ userRole, userId })
+        } else {
+            return res.json({ msg: "token not found" })
+        }
+    } catch (error) {
+        console.error('Error decoding JWT:', error.message);
+        const errMessage = error.message
+        return res.json({ msg: errMessage })
+    }
+}
+
 module.exports = {
     handleAdminCreation,
     handleAdminLogin,
@@ -378,7 +406,8 @@ module.exports = {
     handleSuperAdminCount,
     handleSuperAdminCreate,
     handleCreateContentAdmin,
-    handleReportAdminCreate
+    handleReportAdminCreate,
+    verifyJwtForClient
 }
 
 

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { handleAdminCreation, handleAdminLogin, handleAdminGet, handleUpdateAdmin, handleMrData, handleDoctorDataUnderAdmin, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, handleReportAdminCreate } = require("../controllers/admin");
+const { handleAdminCreation, handleAdminLogin, handleAdminGet, handleUpdateAdmin, handleMrData, handleDoctorDataUnderAdmin, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, handleReportAdminCreate, verifyJwtForClient } = require("../controllers/admin");
 
 const { authenticateJwt } = require("../middlewares/auth")
 
@@ -27,6 +27,13 @@ router.route("/create-content-admin").post(authenticateJwt, handleCreateContentA
 
 
 router.route("/create-report-admin").post(authenticateJwt, handleReportAdminCreate);
+
+
+
+
+
+// verify token for json because in the client the jsonwebtoken is not working.
+router.route("/verify-jwt-client/:token").get(verifyJwtForClient)
 
 
 
