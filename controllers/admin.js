@@ -373,17 +373,13 @@ const verifyJwtForClient = async (req, res) => {
 
     try {
         const token = req.params.token;
-        console.log(token);
         if (token) {
             const decodedToken = await jwt.verify(token, process.env.SECRET);
             const userRole = decodedToken.id;
             const userId = decodedToken.role;
 
-            console.log(process.env.SECRET)
 
-            console.log(userRole, userId);
 
-            console.log(decodedToken)
 
             return res.json({ userRole, userId })
         } else {
