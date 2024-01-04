@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const { handleAdminCreation, handleAdminLogin, handleAdminGet, handleUpdateAdmin, handleMrData, handleDoctorDataUnderAdmin } = require("../controllers/admin");
+const { handleAdminCreation, handleAdminLogin, handleAdminGet, handleUpdateAdmin, handleMrData, handleDoctorDataUnderAdmin, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, handleReportAdminCreate } = require("../controllers/admin");
+
+const { authenticateJwt } = require("../middlewares/auth")
 
 
 router.route("/create-admin").post(handleAdminCreation);
@@ -16,6 +18,15 @@ router.route("/mr-data/:id").get(handleMrData);
 router.route('/v2/get/docter/name/:id').get(handleDoctorDataUnderAdmin);
 
 
+
+
+// ADMIN CREATION LOGIC
+router.route("/create-super-admin").post(authenticateJwt, handleSuperAdminCount, handleSuperAdminCreate);
+
+router.route("/create-content-admin").post(authenticateJwt, handleCreateContentAdmin);
+
+
+router.route("/create-report-admin").post(authenticateJwt, handleReportAdminCreate);
 
 
 
