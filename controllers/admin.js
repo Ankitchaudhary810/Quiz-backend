@@ -242,7 +242,7 @@ const handleSuperAdminCreate = async (req, res) => {
         const admin1 = await AdminModel.findById({ _id: userId });
         if (!admin1) return res.json({ msg: "Main Admin Not Found" })
         if (role !== '1') {
-            return res.json("You are not Default admin");
+            return res.json({msg:"You are not Default admin"});
         }
         const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
         const admin = await AdminModel.findOne({ AdminId: AdminId });
