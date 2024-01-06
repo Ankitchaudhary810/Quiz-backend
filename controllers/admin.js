@@ -242,7 +242,7 @@ const handleSuperAdminCreate = async (req, res) => {
         const admin1 = await AdminModel.findById({ _id: userId });
         if (!admin1) return res.json({ msg: "Main Admin Not Found" })
         if (role !== '1') {
-            return res.json({msg:"You are not Default admin"});
+            return res.json("You are not Default admin");
         }
         const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
         const admin = await AdminModel.findOne({ AdminId: AdminId });
@@ -296,6 +296,7 @@ const handleCreateContentAdmin = async (req, res) => {
         if (role !== 'SUPER_ADMIN') return res.json({ msg: "Only SuperAdmin Create Content Admin" });
 
         const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
+        console.log({ Name, AdminId, Password, Gender, MobileNumber })
         const admin = await AdminModel.findOne({ AdminId: AdminId });
         if (admin) {
             return res.status(400).json({
@@ -375,11 +376,8 @@ const verifyJwtForClient = async (req, res) => {
         const token = req.params.token;
         if (token) {
             const decodedToken = await jwt.verify(token, process.env.SECRET);
-            const userId = decodedToken.id;
-            const userRole = decodedToken.role;
-
-
-
+            const userRole = decodedToken.id;
+            const userId = decodedToken.role;
 
             return res.json({ userRole, userId })
         } else {
