@@ -296,6 +296,7 @@ const handleCreateContentAdmin = async (req, res) => {
         if (role !== 'SUPER_ADMIN') return res.json({ msg: "Only SuperAdmin Create Content Admin" });
 
         const { Name, AdminId, Password, Gender, MobileNumber } = req.body;
+        console.log({ Name, AdminId, Password, Gender, MobileNumber })
         const admin = await AdminModel.findOne({ AdminId: AdminId });
         if (admin) {
             return res.status(400).json({
@@ -377,9 +378,6 @@ const verifyJwtForClient = async (req, res) => {
             const decodedToken = await jwt.verify(token, process.env.SECRET);
             const userRole = decodedToken.id;
             const userId = decodedToken.role;
-
-
-
 
             return res.json({ userRole, userId })
         } else {

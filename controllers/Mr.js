@@ -398,6 +398,12 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                     "TotalCategoryPlayed": categoryCount
                 }
 
+
+                const totalPointsInCategory = doctor.quizCategories.reduce((totalPoints, category) => {
+                    return totalPoints + (category.TotalPoints || 0);
+                }, 0);
+
+
                 const categoryData = doctor.quizCategories.map((category) => {
                     return [{
                         "categoryName": category.categoryName,
@@ -417,6 +423,7 @@ const handleAllMrDoctorsDataV2 = async (req, res) => {
                     doctor.doc || 'Date Not Available',
                     ...categoryData,
                     totalCategoryPlayed,
+                    totalPointsInCategory,
                 ];
             });
 
