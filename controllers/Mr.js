@@ -799,6 +799,33 @@ const handleMrsRegion = async (req, res) => {
     }
 }
 
+
+const handleAdminMrs = async (req, res) => {
+    try {
+
+        const id = req.params.id;
+
+        const admin = await AdminModel.findById({ _id: id });
+        if (!admin) {
+            return res.json({ msg: "Admin not found" })
+        }
+
+        await admin.populate('Mrs');
+
+        const mrs = admin.Mrs;
+
+        return res.json(mrs);
+
+    } catch (error) {
+        console.error(error);
+        const err = error.message;
+        res.status(500).json({
+            error: 'Internal server error',
+            err
+        })
+    }
+}
+
 module.exports = {
     createMr,
     loginMr,
@@ -814,4 +841,5 @@ module.exports = {
     handleTop20Mr,
     handleUpload,
     handleMrsRegion,
+    handleAdminMrs
 }
