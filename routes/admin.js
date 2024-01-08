@@ -1,9 +1,17 @@
 const express = require("express");
 const router = express.Router();
 
+const multer = require('multer');
+
+const fs = require('fs');
+
+const upload = multer({ dest: 'uploads/' });
+
 const { handleAdminCreation, handleAdminLogin, handleAdminGet, handleUpdateAdmin, handleMrData, handleDoctorDataUnderAdmin, handleSuperAdminCount, handleSuperAdminCreate, handleCreateContentAdmin, handleReportAdminCreate, verifyJwtForClient } = require("../controllers/admin");
 
-const { authenticateJwt } = require("../middlewares/auth")
+const { authenticateJwt } = require("../middlewares/auth");
+
+const { handleAdminLogoPost, handleUpdateAdminLogo } = require("../controllers/adminlogo")
 
 
 router.route("/create-admin").post(handleAdminCreation);
@@ -33,7 +41,13 @@ router.route("/create-report-admin").post(authenticateJwt, handleReportAdminCrea
 
 
 // verify token for json because in the client the jsonwebtoken is not working.
-router.route("/verify-jwt-client/:token").get(verifyJwtForClient)
+router.route("/verify-jwt-client/:token").get(verifyJwtForClient);
+
+
+
+// admin logo's route
+router.route("./create-admin-logo", upload.single('image')).post(handleAdminLogoPost);
+router.route("./update-admin-logo", upload.single('image')).put(handleUpdateAdminLogo);
 
 
 

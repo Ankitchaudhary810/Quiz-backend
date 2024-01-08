@@ -38,9 +38,11 @@ app.get('/', (req, res) => {
 const QuizRoutes = require("./routes/Quiz");
 const MrRotues = require("./routes/Mr");
 const AdminRoutes = require("./routes/admin")
+const logoRoute = require("./routes/adminlogo")
 app.use('/api', QuizRoutes);
 app.use('/api', MrRotues);
 app.use("/api", AdminRoutes);
+app.use('/api', logoRoute);
 
 
 const port = process.env.PORT || 3000;
