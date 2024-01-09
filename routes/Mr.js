@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const upload = multer({ dest: 'uploads/' });
 
-const { createMr, loginMr, GetDoctorsByMR, handleAdminSideReports, handleAllMrDoctorsData, handleAllMrDoctorsDataV2, handleForgetPassword, handleTopMrByDoctor, handleTopCategoryChart, handleTop20Mr, handleUpload, handleMrsRegion, handleAllMrDoctorsDataV3, handleAdminMrs, handleGetMrById } = require("../controllers/Mr")
+const { createMr, loginMr, GetDoctorsByMR, handleAdminSideReports, handleAllMrDoctorsData, handleAllMrDoctorsDataV2, handleForgetPassword, handleTopMrByDoctor, handleTopCategoryChart, handleTop20Mr, handleUpload, handleMrsRegion, handleAllMrDoctorsDataV3, handleAdminMrs, handleGetMrById, handleMrUpdate } = require("../controllers/Mr");
 
 
 router.post("/create-mr/:id", createMr);
@@ -33,6 +33,8 @@ router.get("/mr-all-region", handleMrsRegion);
 
 router.get("/admin-mrs/:id", handleAdminMrs);
 router.get("/get-mr-by-id/:id", handleGetMrById);
+
+router.put("/update-mr-details", handleMrUpdate);
 
 
 

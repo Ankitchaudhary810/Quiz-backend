@@ -829,7 +829,27 @@ const handleAdminMrs = async (req, res) => {
 const handleGetMrById = async (req, res) => {
     try {
         const mr = await mrModel.findById({ _id: req.params.id });
-        return res.json(mr);
+        return res.status(200).json(mr);
+    } catch (error) {
+        console.error(error);
+        const err = error.message;
+        res.status(500).json({
+            error: 'Internal server error',
+            err
+        })
+    }
+}
+
+const handleMrUpdate = async (req, res) => {
+    try {
+
+        console.log(req.body);
+        const mr = req.body;
+        const mrdetails = await mrModel.findByIdAndUpdate({ _id: mr.id }, mr, { new: true });
+        console.log(mrdetails);
+
+
+        return res.status(200).json(mrdetails);
     } catch (error) {
         console.error(error);
         const err = error.message;
@@ -856,5 +876,6 @@ module.exports = {
     handleUpload,
     handleMrsRegion,
     handleAdminMrs,
-    handleGetMrById
+    handleGetMrById,
+    handleMrUpdate
 }

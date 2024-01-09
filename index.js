@@ -14,6 +14,7 @@ const apicache = require("apicache");
 // Middleware (INBUILT);
 app.use(cors());
 app.use(express.json());
+app.use(express.static('uploads'));
 dotenv.config();
 
 
