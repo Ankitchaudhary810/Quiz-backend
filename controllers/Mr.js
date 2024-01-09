@@ -826,6 +826,20 @@ const handleAdminMrs = async (req, res) => {
     }
 }
 
+const handleGetMrById = async (req, res) => {
+    try {
+        const mr = await mrModel.findById({ _id: req.params.id });
+        return res.json(mr);
+    } catch (error) {
+        console.error(error);
+        const err = error.message;
+        res.status(500).json({
+            error: 'Internal server error',
+            err
+        })
+    }
+}
+
 module.exports = {
     createMr,
     loginMr,
@@ -841,5 +855,6 @@ module.exports = {
     handleTop20Mr,
     handleUpload,
     handleMrsRegion,
-    handleAdminMrs
+    handleAdminMrs,
+    handleGetMrById
 }
