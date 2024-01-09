@@ -5,12 +5,13 @@ const { handleAdminLogoPost, handleUpdateAdminLogo, getLogoById } = require("../
 
 // Create a multer storage configuration
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads/'); // Specify the correct path
-    },
+    destination: "./uploads",
     filename: function (req, file, cb) {
+
+        const trimmedOriginalname = file.originalname.replace(/\s+/g, '');
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + '-' + file.filename);
+        const finalFilename = `${Date.now()}-${trimmedOriginalname}`;
+        cb(null, finalFilename);
     }
 });
 
