@@ -55,7 +55,7 @@ const handleAdminLogin = async (req, res) => {
                 console.log("process.env.SECRET: ", process.env.SECRET);
                 const name = admin.Name;
 
-                const token = jwt.sign({ id: admin._id, role: admin.role }, process.env.SECRET, { expiresIn: '1h' });
+                const token = jwt.sign({ id: admin._id, role: admin.role }, process.env.SECRET);
                 return res.status(200).json({
                     msg: "Login",
                     success: true,
